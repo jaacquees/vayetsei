@@ -7,20 +7,41 @@
   let menuOpen = false;
   let audio;
   let isPlaying = false;
+  let playingVerseN = null;
+  let activeWordIndex = null;
+  let wordClipEnd = null;
 
   const hebrewNumber = (n) => ({10:'י',11:'יא',12:'יב',13:'יג',14:'יד',15:'טו',16:'טז',17:'יז',18:'יח',19:'יט',20:'כ',21:'כא',22:'כב'}[n]);
 
   function wordsFor(verse) {
-    const source = mode === 'tikkun' ? verse.tikkun : scrollText(verse.tikkun);
-    return source.split(/\s+/);
+    return verse.tikkun.trim().split(/\s+/).map((word) => mode === 'tikkun' ? word : scrollText(word));
+  }
+
+  function audioUrl(verse) {
+    return `${import.meta.env.BASE_URL}${verse.audio}`;
+  }
+
+  async function loadAndSeek(verse, time = 0) {
+    if (!audio) return false;
+    const src = audioUrl(verse);
+    if (!audio.src || !audio.src.endsWith(`/${verse.audio}`)) {
+      audio.src = src;
+      await new Promise((resolve) => {
+        if (audio.readyState >= 1) resolve();
+        else audio.addEventListener('loadedmetadata', resolve, { once: true });
+      });
+    }
+    audio.currentTime = time;
+    return true;
   }
 
   async function playVerse(verse) {
     selected = verse.n;
+    playingVerseN = verse.n;
     menuOpen = false;
-    if (!audio) return;
-    audio.src = verse.audio;
-    audio.currentTime = 0;
+    wordClipEnd = null;
+    activeWordIndex = null;
+    if (!(await loadAndSeek(verse, 0))) return;
     try {
       await audio.play();
       isPlaying = true;
@@ -30,25 +51,75 @@
     document.getElementById(`verse-${verse.n}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  async function playWord(verse, index) {
+    const start = verse.wordStarts?.[index];
+    if (start == null) {
+      await playVerse(verse);
+      return;
+    }
+
+    selected = verse.n;
+    playingVerseN = verse.n;
+    menuOpen = false;
+    activeWordIndex = index;
+    wordClipEnd = verse.wordStarts[index + 1] ?? null;
+
+    if (!(await loadAndSeek(verse, start))) return;
+    try {
+      await audio.play();
+      isPlaying = true;
+    } catch {
+      isPlaying = false;
+    }
+  }
+
   function togglePlayback() {
     const verse = verses.find((v) => v.n === selected) ?? verses[0];
-    if (!audio?.src || !audio.src.includes(verse.audio)) {
+    if (!audio?.src || playingVerseN !== verse.n) {
       playVerse(verse);
       return;
     }
     if (audio.paused) audio.play(); else audio.pause();
   }
 
-  function wordTap() {
-    // Word-specific playback will use the alignment timestamps added in the next data pass.
+  function handleTimeUpdate() {
+    if (!audio || playingVerseN == null) return;
+    const verse = verses.find((v) => v.n === playingVerseN);
+    if (!verse?.wordStarts?.length) return;
+
+    if (wordClipEnd != null && audio.currentTime >= wordClipEnd - 0.025) {
+      audio.pause();
+      wordClipEnd = null;
+      activeWordIndex = null;
+      return;
+    }
+
+    let current = null;
+    for (let i = 0; i < verse.wordStarts.length; i += 1) {
+      if (audio.currentTime >= verse.wordStarts[i] - 0.02) current = i;
+      else break;
+    }
+    activeWordIndex = current;
+  }
+
+  function finishPlayback() {
+    isPlaying = false;
+    activeWordIndex = null;
+    wordClipEnd = null;
   }
 </script>
 
 <svelte:head>
-  <meta name="description" content="Interactive Vayetsei Rishon tikkun practice" />
+  <meta name="description" content="Interactive Vayetsei Rishon parasha practice" />
 </svelte:head>
 
-<audio bind:this={audio} onplay={() => isPlaying = true} onpause={() => isPlaying = false} onended={() => isPlaying = false}></audio>
+<audio
+  bind:this={audio}
+  onplay={() => isPlaying = true}
+  onpause={() => isPlaying = false}
+  onended={finishPlayback}
+  ontimeupdate={handleTimeUpdate}
+></audio>
 
 <header>
   <button class="menu" aria-label="Open pessukim" onclick={() => menuOpen = !menuOpen}>☰</button>
@@ -62,7 +133,7 @@
       <button class:active={mode === 'scroll'} onclick={() => mode = 'scroll'}>Torah</button>
     </div>
     <label class="switch"><input type="checkbox" bind:checked={showTransliteration} /><span>Transliteration</span></label>
-    <button class="play" onclick={togglePlayback}>{isPlaying ? '❚❚' : '▶'}</button>
+    <button class="play" aria-label={isPlaying ? 'Pause' : 'Play'} onclick={togglePlayback}>{isPlaying ? '❚❚' : '▶'}</button>
   </div>
 </header>
 
@@ -84,23 +155,27 @@
     <div class="intro">
       <div>
         <span class="eyebrow">RISHON · 13 PESSUKIM</span>
-        <h1>Practice from the Tikkun.<br />Read from the Torah.</h1>
+        <h1>Parasha Practice tool</h1>
       </div>
-      <p>Tap a passuk to hear the complete recording. Word-by-word playback and live highlighting plug into the same interface once alignment timings are added.</p>
+      <p>Tap a passuk to hear the complete recording. Tap a word to hear that part of the recording; the active word follows along as the passuk plays.</p>
     </div>
 
     <section class="text-card" dir="rtl">
-      {#each verses as verse, i}
+      {#each verses as verse}
         <article id={`verse-${verse.n}`} class:selected={selected === verse.n}>
           <button class="verse-number" aria-label={`Play verse ${verse.n}`} onclick={() => playVerse(verse)}>{hebrewNumber(verse.n)}</button>
           <div class="verse-text">
             <div class:scroll={mode === 'scroll'} class="hebrew">
-              {#each wordsFor(verse) as word}
-                <button class="word" onclick={wordTap}>{word}</button>
+              {#each wordsFor(verse) as word, wordIndex}
+                <button
+                  class="word"
+                  class:active-word={playingVerseN === verse.n && activeWordIndex === wordIndex}
+                  onclick={() => playWord(verse, wordIndex)}
+                >{word}</button>
               {/each}
             </div>
             {#if showTransliteration}
-              <div class="transliteration" dir="ltr">Transliteration layer ready for word-level data.</div>
+              <div class="transliteration" dir="ltr">Transliteration layer is next.</div>
             {/if}
           </div>
           <button class="row-play" aria-label={`Play verse ${verse.n}`} onclick={() => playVerse(verse)}>▶</button>
@@ -152,8 +227,9 @@
   .verse-text { min-width: 0; }
   .hebrew { display: flex; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 9px 11px; font-family: "Times New Roman", "Noto Serif Hebrew", serif; font-size: clamp(26px,3vw,37px); line-height: 1.9; }
   .hebrew.scroll { font-size: clamp(28px,3.2vw,40px); line-height: 1.75; letter-spacing: .03em; }
-  .word { border: 0; padding: 0 1px; background: transparent; color: inherit; cursor: pointer; direction: rtl; border-radius: 5px; }
+  .word { border: 0; padding: 0 3px; background: transparent; color: inherit; cursor: pointer; direction: rtl; border-radius: 6px; transition: background .12s ease, box-shadow .12s ease; }
   .word:hover { background: #e6ebdf; }
+  .word.active-word { background: #d7e4d5; box-shadow: 0 0 0 2px rgba(82,115,99,.14); }
   .transliteration { margin-top: 3px; color: #8d867a; font-size: 11px; font-style: italic; text-align: right; }
   .row-play { width: 34px; height: 34px; border: 0; border-radius: 50%; background: #eee6d8; color: #425f53; cursor: pointer; }
   .scrim { display: none; }
@@ -176,5 +252,6 @@
     .row-play { display: none; }
     .verse-number { width: 30px; height: 30px; }
     .hebrew { gap: 7px 8px; font-size: 29px; line-height: 1.8; }
+    .word { padding: 0 4px; min-height: 42px; }
   }
 </style>
