@@ -7,10 +7,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;600&display=swap" rel="stylesheet" />
+    <style>.align-toggle { display: none !important; }</style>
     <title>Vayetsei Rishon · Tikkun</title>
   </head>
   <body>
     <div id="app"></div>
+    <script>
+      // The instructor alignment editor lives at /vayetsei/adjust/ only.
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('align')) {
+        params.delete('align');
+        const query = params.toString();
+        history.replaceState(null, '', window.location.pathname + (query ? `?${query}` : '') + window.location.hash);
+      }
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
