@@ -7,10 +7,113 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      .align-toggle { display: none !important; }
+      .adjust-speed-control {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .adjust-speed-label {
+        color: #687169;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .adjust-speed-control button {
+        border: 1px solid #c7d0c5;
+        border-radius: 8px;
+        background: #fffdf8;
+        color: #405046;
+        padding: 7px 9px;
+        cursor: pointer;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .adjust-speed-control button.active {
+        background: #243c34;
+        border-color: #243c34;
+        color: white;
+      }
+      @media (max-width: 780px) {
+        .adjust-speed-control { grid-column: 1 / -1; }
+      }
+    </style>
     <title>Vayetsei Rishon · Alignment</title>
+    <script>
+      // Reuse the editor already built into the app, but expose it only from this route.
+      const params = new URLSearchParams(window.location.search);
+      params.set('align', '1');
+      history.replaceState(null, '', window.location.pathname + `?${params.toString()}` + window.location.hash);
+    </script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="../src/main.js"></script>
+    <script>
+      (() => {
+        let selectedRate = 0.75;
+        let editorWasOpened = false;
+
+        function setRateButtons(container) {
+          container.querySelectorAll('button[data-rate]').forEach((button) => {
+            button.classList.toggle('active', Number(button.dataset.rate) === selectedRate);
+          });
+        }
+
+        function installSpeedControl() {
+          const editor = document.querySelector('.alignment-card');
+          const timeline = document.querySelector('.timeline-row');
+          const audio = document.querySelector('audio');
+          if (!editor || !timeline || !audio) return;
+
+          if (!editorWasOpened) {
+            editorWasOpened = true;
+            // Keep the visible URL clean once Svelte has opened the editor.
+            history.replaceState(null, '', window.location.pathname + window.location.hash);
+          }
+
+          if (!timeline.querySelector('.adjust-speed-control')) {
+            const control = document.createElement('div');
+            control.className = 'adjust-speed-control';
+            control.innerHTML = `
+              <span class="adjust-speed-label">Full-passuk speed</span>
+              <button type="button" data-rate="0.5">0.5×</button>
+              <button type="button" data-rate="0.75">0.75×</button>
+              <button type="button" data-rate="1">1×</button>
+            `;
+
+            control.addEventListener('click', (event) => {
+              const button = event.target.closest('button[data-rate]');
+              if (!button) return;
+              selectedRate = Number(button.dataset.rate);
+              audio.playbackRate = selectedRate;
+              setRateButtons(control);
+            });
+
+            timeline.appendChild(control);
+            setRateButtons(control);
+          }
+
+          if (!document.body.dataset.adjustSpeedHooked) {
+            document.body.dataset.adjustSpeedHooked = 'true';
+
+            // Apply slow speed only to full-passuk playback. Word auditions stay natural-speed.
+            document.addEventListener('click', (event) => {
+              const fullPassuk = event.target.closest('.full-passuk');
+              const wordAudition = event.target.closest('.audition, .alignment-words button, .editor-focus-row > button');
+              if (fullPassuk) audio.playbackRate = selectedRate;
+              else if (wordAudition) audio.playbackRate = 1;
+            }, true);
+          }
+        }
+
+        const observer = new MutationObserver(installSpeedControl);
+        observer.observe(document.body, { childList: true, subtree: true });
+        installSpeedControl();
+      })();
+    </script>
   </body>
 </html>
