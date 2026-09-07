@@ -3,8 +3,6 @@
   import { verses, scrollText } from './lib/verses.js';
 
   const STORAGE_KEY = 'vayetsei-alignment-overrides-v1';
-  const WORD_PREROLL = 0.08;
-  const WORD_POSTROLL = 0.06;
 
   let mode = 'tikkun';
   let showTransliteration = false;
@@ -54,6 +52,11 @@
     return timingOverrides[verse.n] ?? verse.wordStarts ?? [];
   }
 
+  function endFor(verse, index) {
+    const starts = startsFor(verse);
+    return starts[index + 1] ?? audioDuration ?? 0;
+  }
+
   function saveOverrides(next) {
     timingOverrides = next;
     try {
@@ -94,7 +97,9 @@
     wordClipEnd = null;
     clippedWordIndex = null;
     activeWordIndex = null;
-    if (!(await loadAndSeek(verse, 0))) return;
+
+    const firstWordStart = startsFor(verse)[0] ?? 0;
+    if (!(await loadAndSeek(verse, firstWordStart))) return;
     try {
       await audio.play();
       isPlaying = true;
@@ -119,13 +124,10 @@
     clippedWordIndex = index;
     editorWordIndex = index;
 
-    const seekTime = Math.max(0, boundary - WORD_PREROLL);
-    if (!(await loadAndSeek(verse, seekTime))) return;
+    if (!(await loadAndSeek(verse, boundary))) return;
 
     const nextBoundary = starts[index + 1];
-    wordClipEnd = nextBoundary == null
-      ? audio.duration
-      : Math.min(audio.duration, nextBoundary + WORD_POSTROLL);
+    wordClipEnd = nextBoundary == null ? audio.duration : Math.min(audio.duration, nextBoundary);
 
     try {
       await audio.play();
@@ -154,7 +156,7 @@
     const starts = verse ? startsFor(verse) : [];
     if (!starts.length) return;
 
-    if (wordClipEnd != null && audio.currentTime >= wordClipEnd - 0.02) {
+    if (wordClipEnd != null && audio.currentTime >= wordClipEnd - 0.01) {
       audio.pause();
       wordClipEnd = null;
       clippedWordIndex = null;
@@ -169,7 +171,7 @@
 
     let current = null;
     for (let i = 0; i < starts.length; i += 1) {
-      if (audio.currentTime >= starts[i] - 0.02) current = i;
+      if (audio.currentTime >= starts[i] - 0.01) current = i;
       else break;
     }
     activeWordIndex = current;
@@ -189,13 +191,20 @@
     return Math.max(min, Math.min(value, max));
   }
 
+  function boundaryMessage(verse, index, value) {
+    if (index === 0) {
+      return `First word starts at ${value.toFixed(2)}s; everything before it is skipped`;
+    }
+    return `${sourceWords(verse)[index - 1]} ends and ${sourceWords(verse)[index]} starts at ${value.toFixed(2)}s`;
+  }
+
   function nudgeWord(verse, index, delta) {
     const starts = [...startsFor(verse)];
     if (starts[index] == null) return;
     starts[index] = Number(clampBoundary(starts, index, starts[index] + delta).toFixed(2));
     setVerseStarts(verse, starts);
     editorWordIndex = index;
-    editorMessage = `Saved ${sourceWords(verse)[index]} at ${starts[index].toFixed(2)}s`;
+    editorMessage = boundaryMessage(verse, index, starts[index]);
   }
 
   async function setBoundaryHere(verse, index) {
@@ -204,7 +213,7 @@
     starts[index] = Number(clampBoundary(starts, index, audioCurrentTime).toFixed(2));
     setVerseStarts(verse, starts);
     editorWordIndex = index;
-    editorMessage = `Set ${sourceWords(verse)[index]} to ${starts[index].toFixed(2)}s`;
+    editorMessage = boundaryMessage(verse, index, starts[index]);
   }
 
   async function seekEditor(verse, time) {
@@ -346,7 +355,9 @@
               onclick={() => { editorWordIndex = wordIndex; playWord(selectedVerse(), wordIndex); }}
             >
               <span>{word}</span>
-              <small>{startsFor(selectedVerse())[wordIndex]?.toFixed(2)}s</small>
+              <small>
+                {startsFor(selectedVerse())[wordIndex]?.toFixed(2)}–{wordIndex < sourceWords(selectedVerse()).length - 1 ? endFor(selectedVerse(), wordIndex)?.toFixed(2) : audioDuration.toFixed(2)}s
+              </small>
             </button>
           {/each}
         </div>
@@ -355,7 +366,9 @@
           <button onclick={() => jumpEditorWord(-1)} disabled={editorWordIndex === 0}>← Previous</button>
           <div class="editor-focus" dir="rtl">
             <strong>{sourceWords(selectedVerse())[editorWordIndex]}</strong>
-            <span>{startsFor(selectedVerse())[editorWordIndex]?.toFixed(2)}s</span>
+            <span>
+              {startsFor(selectedVerse())[editorWordIndex]?.toFixed(2)}–{editorWordIndex < sourceWords(selectedVerse()).length - 1 ? endFor(selectedVerse(), editorWordIndex)?.toFixed(2) : audioDuration.toFixed(2)}s
+            </span>
           </div>
           <button onclick={() => jumpEditorWord(1)} disabled={editorWordIndex >= sourceWords(selectedVerse()).length - 1}>Next →</button>
         </div>
@@ -380,11 +393,13 @@
             oninput={(event) => seekEditor(selectedVerse(), Number(event.currentTarget.value))}
           />
           <span class="time-readout">{audioCurrentTime.toFixed(2)} / {audioDuration.toFixed(2)}s</span>
-          <button class="set-boundary" onclick={() => setBoundaryHere(selectedVerse(), editorWordIndex)}>Set start here</button>
+          <button class="set-boundary" onclick={() => setBoundaryHere(selectedVerse(), editorWordIndex)}>
+            {editorWordIndex === 0 ? 'Set first word start' : 'Set shared boundary'}
+          </button>
         </div>
 
         <div class="editor-footer">
-          <span>Edits save in this browser. Copy the timings when you want them committed to the site.</span>
+          <span>Each boundary is shared: it ends the previous word and starts the next. The first boundary clips any audio before the first word. Edits save in this browser.</span>
           <div class="editor-actions">
             <button onclick={() => copyVerseTimings(selectedVerse())}>Copy passuk</button>
             <button onclick={copyAllTimings}>Copy all</button>
