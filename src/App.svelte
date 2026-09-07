@@ -84,7 +84,7 @@
     <div class="intro">
       <div>
         <span class="eyebrow">RISHON · 13 PESSUKIM</span>
-        <h1>Practice from the Tikkun.<br />Read from the Torah.</h1>
+        <h1>Parasha Practice tool</h1>
       </div>
       <p>Tap a passuk to hear the complete recording. Word-by-word playback and live highlighting plug into the same interface once alignment timings are added.</p>
     </div>
