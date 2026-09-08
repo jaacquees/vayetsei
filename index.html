@@ -7,7 +7,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;600&display=swap" rel="stylesheet" />
-    <style>.align-toggle { display: none !important; }</style>
+    <style>
+      @font-face {
+        font-family: "Taamey Frank CLM";
+        src: url("https://raw.githubusercontent.com/Sefaria/Sefaria-Project/master/static/fonts/Taamey-Frank/TaameyFrankCLM-Medium.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+      }
+
+      .align-toggle { display: none !important; }
+
+      /* Use a font designed for niqqud + taamim positioning. This keeps
+         meteg/siluq from colliding with segol in words such as זַרְעֶֽךָ. */
+      .hebrew,
+      .hebrew .word,
+      .verse-ref,
+      .verse-number {
+        font-family: "Taamey Frank CLM", "Noto Serif Hebrew", serif !important;
+      }
+    </style>
     <title>Vayetsei Rishon · Tikkun</title>
   </head>
   <body>
