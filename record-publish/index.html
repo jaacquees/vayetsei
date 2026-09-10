@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f1e4" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;600&display=swap" rel="stylesheet" />
+    <title>Vayetsei · Teacher Publisher</title>
+    <style>
+      * { box-sizing: border-box; }
+      :root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#25241f; background:#f6f1e7; }
+      body { margin:0; min-height:100vh; }
+      button, select, input { font:inherit; }
+      button { touch-action:manipulation; }
+      header { position:sticky; top:0; z-index:10; padding:14px 22px; background:rgba(246,241,231,.96); backdrop-filter:blur(12px); border-bottom:1px solid #d8d0c2; }
+      header strong { display:block; font-family:"Noto Serif Hebrew", Georgia, serif; font-size:18px; }
+      header span { display:block; margin-top:3px; color:#766f64; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+      main { width:min(980px,100%); margin:0 auto; padding:42px 24px 90px; }
+      .eyebrow { color:#7f6c45; font-size:11px; font-weight:800; letter-spacing:.15em; text-transform:uppercase; }
+      h1 { margin:8px 0 12px; font-family:Georgia,"Times New Roman",serif; font-size:clamp(34px,6vw,56px); font-weight:500; line-height:1; letter-spacing:-.035em; }
+      .lede { max-width:760px; margin:0 0 26px; color:#6f695f; line-height:1.55; }
+      .card { border:1px solid #d2c7b5; border-radius:20px; background:#fffdf7; box-shadow:0 18px 50px rgba(72,55,29,.07); overflow:hidden; }
+      .setup { display:grid; grid-template-columns:minmax(190px,1fr) auto; gap:16px; align-items:end; padding:22px 24px; border-bottom:1px solid #e7dfd2; }
+      label { display:grid; gap:7px; color:#716b61; font-size:12px; font-weight:700; }
+      select, input[type="password"] { width:100%; border:1px solid #cfc5b5; border-radius:10px; padding:10px 12px; background:#fff; color:#2e2d28; }
+      .record-actions, .nudges, .publish-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+      button { border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:750; }
+      .primary { background:#243c34; color:white; }
+      .danger { background:#8b3a32; color:white; }
+      .secondary { border:1px solid #c8c0b4; background:#f8f4ec; color:#45423c; }
+      .publish { background:#294f3e; color:white; min-width:170px; }
+      button:disabled { opacity:.45; cursor:default; }
+      .statusbar { display:flex; align-items:center; gap:10px; min-height:42px; padding:10px 24px; background:#f5efe5; color:#69635a; font-size:12px; }
+      .dot { width:9px; height:9px; border-radius:50%; background:#aaa; }
+      .dot.recording { background:#c64134; box-shadow:0 0 0 5px rgba(198,65,52,.11); animation:pulse 1.2s infinite; }
+      @keyframes pulse { 50% { opacity:.45; } }
+      .timer { margin-left:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-weight:700; }
+      .instructions { padding:18px 24px 4px; color:#5f5a51; font-size:13px; line-height:1.5; }
+      .words { display:flex; flex-wrap:wrap; justify-content:flex-start; gap:10px 12px; padding:20px 24px 28px; direction:rtl; font-family:"Noto Serif Hebrew","Times New Roman",serif; }
+      .word { min-width:70px; min-height:68px; border:1px solid #ddd3c4; border-radius:13px; padding:10px 10px 8px; background:#fffdf8; color:#282721; font-family:inherit; font-size:26px; line-height:1.25; }
+      .word small { display:block; margin-top:6px; direction:ltr; color:#9b9387; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:9px; }
+      .word.next { border-color:#4d6f5f; box-shadow:0 0 0 3px rgba(77,111,95,.14); background:#edf3e9; }
+      .word.marked { background:#dfe9dc; border-color:#b5c9b7; }
+      .word.review-selected { outline:3px solid rgba(127,108,69,.28); outline-offset:2px; }
+      .word.playing { background:#cbdcc8; border-color:#527363; box-shadow:0 0 0 3px rgba(82,115,99,.14); }
+      .review { display:none; border-top:1px solid #e7dfd2; padding:24px; background:#f5f7f1; }
+      .review.visible { display:block; }
+      .review h2 { margin:0 0 8px; font-family:Georgia,"Times New Roman",serif; font-size:24px; font-weight:500; }
+      .review > p { margin:0 0 16px; color:#6f695f; font-size:12px; line-height:1.5; }
+      audio { width:100%; margin:4px 0 16px; }
+      .review-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+      .boundary-card, .publish-card { border:1px solid #ccd5c9; border-radius:14px; padding:14px; background:rgba(255,255,255,.72); }
+      .boundary-card strong { display:block; direction:rtl; font-family:"Noto Serif Hebrew",serif; font-size:28px; }
+      .time { margin-top:4px; color:#5c665f; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+      .nudges { margin-top:12px; }
+      .nudges button { border:1px solid #c7d0c5; background:#fffdf8; padding:8px 10px; font-size:12px; }
+      .publish-card p { margin:0 0 12px; color:#6f695f; font-size:12px; line-height:1.45; }
+      .publish-row { margin-top:10px; }
+      .publish-row label { flex:1 1 220px; }
+      .notice { margin-top:12px; min-height:20px; color:#365c48; font-size:12px; font-weight:650; }
+      .privacy { margin-top:16px; color:#898176; font-size:11px; line-height:1.45; }
+      .countdown { position:fixed; inset:0; z-index:99; display:none; place-items:center; background:rgba(25,25,21,.5); color:white; font-family:Georgia,serif; font-size:min(30vw,160px); font-weight:700; }
+      .countdown.visible { display:grid; }
+      @media(max-width:680px){ header{padding:12px 14px} main{padding:30px 12px 60px}.setup{grid-template-columns:1fr;padding:18px 16px}.statusbar,.instructions{padding-left:16px;padding-right:16px}.words{padding:16px 12px 24px;gap:8px}.word{min-width:62px;min-height:64px;font-size:23px}.review{padding:18px 14px}.review-grid{grid-template-columns:1fr} }
+    </style>
+  </head>
+  <body>
+    <header><strong>וַיֵּצֵא · Teacher publisher</strong><span>Record · mark · review · publish</span></header>
+    <main>
+      <span class="eyebrow">INSTRUCTOR TOOL</span>
+      <h1>Record the passuk and publish it</h1>
+      <p class="lede">Tap each word as you begin singing it. Afterward, tap any word to hear only that word, fine-tune its boundary, then publish the finished recording directly to the student practice app.</p>
+      <section class="card">
+        <div class="setup">
+          <label>Passuk<select id="verseSelect"></select></label>
+          <div class="record-actions"><button id="startButton" class="primary">● Start recording</button><button id="stopButton" class="danger" disabled>■ Stop</button><button id="resetButton" class="secondary" disabled>Reset</button></div>
+        </div>
+        <div class="statusbar"><span id="statusDot" class="dot"></span><span id="statusText">Ready.</span><span id="timer" class="timer">0.00s</span></div>
+        <div class="instructions">After the countdown, tap the highlighted word exactly when you start singing it. The next word highlights automatically.</div>
+        <div id="words" class="words"></div>
+        <section id="review" class="review">
+          <h2>Review</h2>
+          <p><strong>Tap a Hebrew word above to hear only that word</strong> — from its start boundary to the next word's boundary. Use the controls below if its start needs a small correction.</p>
+          <audio id="playback" controls></audio>
+          <div class="review-grid">
+            <div class="boundary-card">
+              <strong id="selectedWord">—</strong><div id="selectedTime" class="time">No boundary selected</div>
+              <div class="nudges"><button data-delta="-0.10">−100 ms</button><button data-delta="-0.05">−50 ms</button><button id="setPlayhead">Set at playhead</button><button data-delta="0.05">+50 ms</button><button data-delta="0.10">+100 ms</button></div>
+            </div>
+            <div class="publish-card">
+              <p>When every word sounds right, publish this recording. It becomes the live audio + boundaries used by the student app for this passuk.</p>
+              <div class="publish-row">
+                <label>Teacher publish key<input id="publishKey" type="password" autocomplete="current-password" placeholder="Enter publish key" /></label>
+                <button id="publishButton" class="publish" disabled>Publish to practice app</button>
+              </div>
+              <div id="publishStatus" class="notice"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+      <p class="privacy">The recording stays local until you press Publish. Published recordings are stored in Vercel Blob with versioned metadata; older versions remain available for rollback.</p>
+    </main>
+    <div id="countdown" class="countdown"></div>
+    <script>
+      const VERSES = [
+        { n:10,t:'וַיֵּצֵ֥א יַעֲקֹ֖ב מִבְּאֵ֣ר שָׁ֑בַע וַיֵּ֖לֶךְ חָרָֽנָה׃' },
+        { n:11,t:'וַיִּפְגַּ֨ע בַּמָּק֜וֹם וַיָּ֤לֶן שָׁם֙ כִּי־בָ֣א הַשֶּׁ֔מֶשׁ וַיִּקַּח֙ מֵאַבְנֵ֣י הַמָּק֔וֹם וַיָּ֖שֶׂם מְרַֽאֲשֹׁתָ֑יו וַיִּשְׁכַּ֖ב בַּמָּק֥וֹם הַהֽוּא׃' },
+        { n:12,t:'וַֽיַּחֲלֹ֗ם וְהִנֵּ֤ה סֻלָּם֙ מֻצָּ֣ב אַ֔רְצָה וְרֹאשׁ֖וֹ מַגִּ֣יעַ הַשָּׁמָ֑יְמָה וְהִנֵּה֙ מַלְאֲכֵ֣י אֱלֹהִ֔ים עֹלִ֥ים וְיֹרְדִ֖ים בּֽוֹ׃' },
+        { n:13,t:'וְהִנֵּ֨ה יְהֹוָ֜ה נִצָּ֣ב עָלָיו֮ וַיֹּאמַר֒ אֲנִ֣י יְהֹוָ֗ה אֱלֹהֵי֙ אַבְרָהָ֣ם אָבִ֔יךָ וֵאלֹהֵ֖י יִצְחָ֑ק הָאָ֗רֶץ אֲשֶׁ֤ר אַתָּה֙ שֹׁכֵ֣ב עָלֶ֔יהָ לְךָ֥ אֶתְּנֶ֖נָּה וּלְזַרְעֶֽךָ׃' },
+        { n:14,t:'וְהָיָ֤ה זַרְעֲךָ֙ כַּעֲפַ֣ר הָאָ֔רֶץ וּפָרַצְתָּ֛ יָ֥מָּה וָקֵ֖דְמָה וְצָפֹ֣נָה וָנֶ֑גְבָּה וְנִבְרְכ֥וּ בְךָ֛ כׇּל־מִשְׁפְּחֹ֥ת הָאֲדָמָ֖ה וּבְזַרְעֶֽךָ׃' },
+        { n:15,t:'וְהִנֵּ֨ה אָנֹכִ֜י עִמָּ֗ךְ וּשְׁמַרְתִּ֙יךָ֙ בְּכֹ֣ל אֲשֶׁר־תֵּלֵ֔ךְ וַהֲשִׁבֹתִ֔יךָ אֶל־הָאֲדָמָ֖ה הַזֹּ֑את כִּ֚י לֹ֣א אֶֽעֱזׇבְךָ֔ עַ֚ד אֲשֶׁ֣ר אִם־עָשִׂ֔יתִי אֵ֥ת אֲשֶׁר־דִּבַּ֖רְתִּי לָֽךְ׃' },
+        { n:16,t:'וַיִּיקַ֣ץ יַעֲקֹב֮ מִשְּׁנָתוֹ֒ וַיֹּ֕אמֶר אָכֵן֙ יֵ֣שׁ יְהֹוָ֔ה בַּמָּק֖וֹם הַזֶּ֑ה וְאָנֹכִ֖י לֹ֥א יָדָֽעְתִּי׃' },
+        { n:17,t:'וַיִּירָא֙ וַיֹּאמַ֔ר מַה־נּוֹרָ֖א הַמָּק֣וֹם הַזֶּ֑ה אֵ֣ין זֶ֗ה כִּ֚י אִם־בֵּ֣ית אֱלֹהִ֔ים וְזֶ֖ה שַׁ֥עַר הַשָּׁמָֽיִם׃' },
+        { n:18,t:'וַיַּשְׁכֵּ֨ם יַעֲקֹ֜ב בַּבֹּ֗קֶר וַיִּקַּ֤ח אֶת־הָאֶ֙בֶן֙ אֲשֶׁר־שָׂ֣ם מְרַֽאֲשֹׁתָ֔יו וַיָּ֥שֶׂם אֹתָ֖הּ מַצֵּבָ֑ה וַיִּצֹ֥ק שֶׁ֖מֶן עַל־רֹאשָֽׁהּ׃' },
+        { n:19,t:'וַיִּקְרָ֛א אֶת־שֵֽׁם־הַמָּק֥וֹם הַה֖וּא בֵּֽית־אֵ֑ל וְאוּלָ֛ם ל֥וּז שֵׁם־הָעִ֖יר לָרִאשֹׁנָֽה׃' },
+        { n:20,t:'וַיִּדַּ֥ר יַעֲקֹ֖ב נֶ֣דֶר לֵאמֹ֑ר אִם־יִהְיֶ֨ה אֱלֹהִ֜ים עִמָּדִ֗י וּשְׁמָרַ֙נִי֙ בַּדֶּ֤רֶךְ הַזֶּה֙ אֲשֶׁ֣ר אָנֹכִ֣י הוֹלֵ֔ךְ וְנָֽתַן־לִ֥י לֶ֛חֶם לֶאֱכֹ֖ל וּבֶ֥גֶד לִלְבֹּֽשׁ׃' },
+        { n:21,t:'וְשַׁבְתִּ֥י בְשָׁל֖וֹם אֶל־בֵּ֣ית אָבִ֑י וְהָיָ֧ה יְהֹוָ֛ה לִ֖י לֵאלֹהִֽים׃' },
+        { n:22,t:'וְהָאֶ֣בֶן הַזֹּ֗את אֲשֶׁר־שַׂ֙מְתִּי֙ מַצֵּבָ֔ה יִהְיֶ֖ה בֵּ֣ית אֱלֹהִ֑ים וְכֹל֙ אֲשֶׁ֣ר תִּתֶּן־לִ֔י עַשֵּׂ֖ר אֲעַשְּׂרֶ֥נּוּ לָֽךְ׃' }
+      ];
+      const $ = (id) => document.getElementById(id);
+      const verseSelect=$('verseSelect'), wordsEl=$('words'), startButton=$('startButton'), stopButton=$('stopButton'), resetButton=$('resetButton'), statusDot=$('statusDot'), statusText=$('statusText'), timer=$('timer'), review=$('review'), playback=$('playback'), selectedWord=$('selectedWord'), selectedTime=$('selectedTime'), setPlayhead=$('setPlayhead'), publishKey=$('publishKey'), publishButton=$('publishButton'), publishStatus=$('publishStatus'), countdown=$('countdown');
+      let mediaRecorder=null, mediaStream=null, chunks=[], recordingBlob=null, objectUrl=null, recordingStartMs=0, recording=false, wordStarts=[], nextWordIndex=0, reviewWordIndex=0, duration=0, timerHandle=null, clipEnd=null;
+      for(const verse of VERSES){ const option=document.createElement('option'); option.value=verse.n; option.textContent=`Passuk ${verse.n-9} · Bereishit 28:${verse.n}`; verseSelect.appendChild(option); }
+      publishKey.value=sessionStorage.getItem('vayetsei-teacher-publish-key')||'';
+      publishKey.addEventListener('input',()=>{ sessionStorage.setItem('vayetsei-teacher-publish-key',publishKey.value); updatePublishState(); });
+      function currentVerse(){ return VERSES.find(v=>v.n===Number(verseSelect.value))||VERSES[0]; }
+      function currentWords(){ return currentVerse().t.trim().split(/\s+/); }
+      function complete(){ return recordingBlob && wordStarts.length===currentWords().length && wordStarts.every(Number.isFinite); }
+      function updatePublishState(){ publishButton.disabled=!complete() || !publishKey.value.trim(); }
+      function renderWords(){
+        const words=currentWords(); wordsEl.innerHTML='';
+        words.forEach((word,index)=>{ const b=document.createElement('button'); b.type='button'; b.className='word'; b.innerHTML=`<span>${word}</span><small>${wordStarts[index]==null?'—':`${wordStarts[index].toFixed(2)}s`}</small>`;
+          if(recording&&index===nextWordIndex)b.classList.add('next'); if(wordStarts[index]!=null)b.classList.add('marked'); if(!recording&&review.classList.contains('visible')&&index===reviewWordIndex)b.classList.add('review-selected');
+          b.addEventListener('pointerdown',(e)=>{ e.preventDefault(); if(recording)markWord(index); else if(review.classList.contains('visible')&&wordStarts[index]!=null) auditionWord(index); }); wordsEl.appendChild(b); });
+      }
+      function setStatus(text,isRecording=false){ statusText.textContent=text; statusDot.classList.toggle('recording',isRecording); }
+      function updateTimer(){ if(!recording)return; timer.textContent=`${((performance.now()-recordingStartMs)/1000).toFixed(2)}s`; timerHandle=requestAnimationFrame(updateTimer); }
+      async function showCountdown(){ countdown.classList.add('visible'); for(const v of ['3','2','1']){ countdown.textContent=v; await new Promise(r=>setTimeout(r,500)); } countdown.textContent='GO'; await new Promise(r=>setTimeout(r,250)); countdown.classList.remove('visible'); countdown.textContent=''; }
+      async function startRecording(){
+        if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){ setStatus('This browser does not support microphone recording.'); return; }
+        startButton.disabled=true; verseSelect.disabled=true; review.classList.remove('visible'); wordStarts=[]; nextWordIndex=0; duration=0; recordingBlob=null; clipEnd=null; renderWords(); updatePublishState(); setStatus('Waiting for microphone permission…');
+        try{ mediaStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); }catch(e){ startButton.disabled=false; verseSelect.disabled=false; setStatus(`Microphone unavailable: ${e?.message||'permission denied'}`); return; }
+        await showCountdown(); chunks=[]; const preferred=['audio/webm;codecs=opus','audio/mp4','audio/webm'].find(t=>MediaRecorder.isTypeSupported(t)); mediaRecorder=preferred?new MediaRecorder(mediaStream,{mimeType:preferred}):new MediaRecorder(mediaStream); mediaRecorder.addEventListener('dataavailable',e=>{if(e.data?.size)chunks.push(e.data)}); mediaRecorder.addEventListener('stop',finishRecording,{once:true}); mediaRecorder.start(100); recordingStartMs=performance.now(); recording=true; stopButton.disabled=false; resetButton.disabled=true; timer.textContent='0.00s'; setStatus('Recording — tap each highlighted word as you begin it.',true); renderWords(); updateTimer();
+      }
+      function markWord(index){ if(!recording||index!==nextWordIndex)return; wordStarts[index]=Number(Math.max(0,(performance.now()-recordingStartMs)/1000).toFixed(3)); nextWordIndex++; renderWords(); if(nextWordIndex>=currentWords().length)setStatus('All starts marked. Finish the passuk, then press Stop.',true); }
+      function stopRecording(){ if(!recording||!mediaRecorder)return; duration=Math.max(0,(performance.now()-recordingStartMs)/1000); recording=false; cancelAnimationFrame(timerHandle); timer.textContent=`${duration.toFixed(2)}s`; stopButton.disabled=true; setStatus('Processing recording…'); mediaRecorder.stop(); mediaStream?.getTracks().forEach(t=>t.stop()); mediaStream=null; }
+      function finishRecording(){ const type=mediaRecorder?.mimeType||chunks[0]?.type||'audio/webm'; recordingBlob=new Blob(chunks,{type}); if(objectUrl)URL.revokeObjectURL(objectUrl); objectUrl=URL.createObjectURL(recordingBlob); playback.src=objectUrl; playback.load(); review.classList.add('visible'); startButton.disabled=false; verseSelect.disabled=false; resetButton.disabled=false; reviewWordIndex=Math.max(0,wordStarts.findIndex(v=>v!=null)); renderWords(); updateReviewCard(); updatePublishState(); const missing=currentWords().length-wordStarts.filter(v=>v!=null).length; setStatus(missing?`Recording ready — ${missing} boundaries still missing.`:'Recording ready — tap words to audition them, then publish when satisfied.'); }
+      function resetRecording(){ recording=false; cancelAnimationFrame(timerHandle); mediaRecorder=null; mediaStream?.getTracks().forEach(t=>t.stop()); mediaStream=null; chunks=[]; recordingBlob=null; wordStarts=[]; nextWordIndex=0; duration=0; clipEnd=null; timer.textContent='0.00s'; playback.pause(); playback.removeAttribute('src'); playback.load(); if(objectUrl)URL.revokeObjectURL(objectUrl); objectUrl=null; review.classList.remove('visible'); startButton.disabled=false; stopButton.disabled=true; resetButton.disabled=true; verseSelect.disabled=false; publishStatus.textContent=''; setStatus('Ready.'); renderWords(); updatePublishState(); }
+      function updateReviewCard(){ const words=currentWords(), start=wordStarts[reviewWordIndex], end=wordStarts[reviewWordIndex+1]??(playback.duration||duration); selectedWord.textContent=words[reviewWordIndex]||'—'; selectedTime.textContent=start==null?'No boundary recorded':`Starts ${start.toFixed(3)}s · ends ${Number(end).toFixed(3)}s`; }
+      function auditionWord(index){ reviewWordIndex=index; clipEnd=wordStarts[index+1]??(playback.duration||duration); renderWords(); updateReviewCard(); playback.pause(); playback.currentTime=Math.max(0,wordStarts[index]); playback.play().catch(()=>{}); }
+      function clampBoundary(index,value){ const prev=index>0&&wordStarts[index-1]!=null?wordStarts[index-1]+.02:0; const next=index<wordStarts.length-1&&wordStarts[index+1]!=null?wordStarts[index+1]-.02:Math.max(duration,playback.duration||0); return Math.max(prev,Math.min(value,next||value)); }
+      function nudge(delta){ if(wordStarts[reviewWordIndex]==null)return; wordStarts[reviewWordIndex]=Number(clampBoundary(reviewWordIndex,wordStarts[reviewWordIndex]+delta).toFixed(3)); clipEnd=null; renderWords(); updateReviewCard(); updatePublishState(); publishStatus.textContent=`Boundary adjusted ${delta>0?'+':''}${Math.round(delta*1000)} ms.`; }
+      function setAtPlayhead(){ if(wordStarts[reviewWordIndex]==null)return; wordStarts[reviewWordIndex]=Number(clampBoundary(reviewWordIndex,playback.currentTime).toFixed(3)); clipEnd=null; renderWords(); updateReviewCard(); updatePublishState(); publishStatus.textContent='Start moved to the current playhead.'; }
+      function activePlaybackWord(){ let index=-1; for(let i=0;i<wordStarts.length;i++){ if(wordStarts[i]==null)break; if(playback.currentTime>=wordStarts[i])index=i; else break; } return index; }
+      playback.addEventListener('timeupdate',()=>{ if(clipEnd!=null&&playback.currentTime>=clipEnd-.01){ playback.pause(); playback.currentTime=Math.max(0,clipEnd); clipEnd=null; } const active=activePlaybackWord(); Array.from(wordsEl.children).forEach((b,i)=>b.classList.toggle('playing',i===active&&!playback.paused)); });
+      playback.addEventListener('play',()=>{ if(clipEnd==null){} }); playback.addEventListener('ended',()=>{clipEnd=null;Array.from(wordsEl.children).forEach(b=>b.classList.remove('playing'))});
+      document.querySelectorAll('[data-delta]').forEach(b=>b.addEventListener('click',()=>nudge(Number(b.dataset.delta)))); setPlayhead.addEventListener('click',setAtPlayhead); startButton.addEventListener('click',startRecording); stopButton.addEventListener('click',stopRecording); resetButton.addEventListener('click',resetRecording); verseSelect.addEventListener('change',resetRecording);
+      publishButton.addEventListener('click',async()=>{
+        if(!complete())return; const key=publishKey.value.trim(); if(!key)return; publishButton.disabled=true; publishButton.textContent='Publishing…'; publishStatus.textContent='Uploading audio and boundaries…';
+        try{ const form=new FormData(); form.append('verse',String(currentVerse().n)); form.append('wordStarts',JSON.stringify(wordStarts)); const type=recordingBlob.type||'audio/webm'; const ext=type.includes('mp4')?'m4a':type.includes('ogg')?'ogg':'webm'; form.append('audio',recordingBlob,`passuk-${currentVerse().n}.${ext}`); const response=await fetch('/api/publish',{method:'POST',headers:{Authorization:`Bearer ${key}`},body:form}); const result=await response.json().catch(()=>({})); if(!response.ok)throw new Error(result.error||`Publish failed (${response.status})`); publishStatus.textContent=`Published ✓ ${new Date(result.recording.publishedAt).toLocaleString()}. The student app will use this version on its next load.`; }
+        catch(e){ publishStatus.textContent=`Publish failed: ${e?.message||e}`; }
+        finally{ publishButton.textContent='Publish to practice app'; updatePublishState(); }
+      });
+      verseSelect.value='10'; renderWords(); updatePublishState();
+    </script>
+  </body>
+</html>
