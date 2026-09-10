@@ -42,9 +42,6 @@ function validateStarts(value, expectedCount) {
 }
 
 export async function POST(request) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return json({ error: 'Vercel Blob is not connected to this project.' }, 503);
-  }
   if (!process.env.TEACHER_PUBLISH_KEY) {
     return json({ error: 'TEACHER_PUBLISH_KEY is not configured on Vercel.' }, 503);
   }
@@ -83,19 +80,20 @@ export async function POST(request) {
     const stamp = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
     const root = `vayetsei/rishon/verse-${verse}`;
     const ext = extensionFor(audio.type);
+    const audioPathname = `${root}/audio-${stamp}.${ext}`;
 
-    const audioBlob = await put(`${root}/audio-${stamp}.${ext}`, audio, {
-      access: 'public',
+    const audioBlob = await put(audioPathname, audio, {
+      access: 'private',
       addRandomSuffix: false,
       contentType: audio.type,
       cacheControlMaxAge: 31536000
     });
 
     const metadata = {
-      version: 2,
+      version: 3,
       n: verse,
       wordStarts,
-      audioUrl: audioBlob.url,
+      audioPathname: audioBlob.pathname,
       audioType: audio.type,
       audioSize: audio.size,
       duration: Number.isFinite(duration) ? Number(duration.toFixed(3)) : null,
@@ -106,14 +104,14 @@ export async function POST(request) {
       `${root}/meta-${stamp}.json`,
       JSON.stringify(metadata, null, 2),
       {
-        access: 'public',
+        access: 'private',
         addRandomSuffix: false,
         contentType: 'application/json',
         cacheControlMaxAge: 60
       }
     );
 
-    return json({ ok: true, recording: metadata, metadataUrl: metadataBlob.url }, 201);
+    return json({ ok: true, recording: metadata, metadataPathname: metadataBlob.pathname }, 201);
   } catch (error) {
     console.error('publish failed', error);
     return json({ error: error?.message || 'Publish failed.' }, 500);
