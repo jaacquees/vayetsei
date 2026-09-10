@@ -22,14 +22,14 @@ async function loadPublishedRecordings() {
       verse.publishedAt = published.publishedAt || null;
       verse.audioSource = 'published';
 
-      // For a teacher-published recording, use the direct signed Blob URL.
-      // This keeps byte-range seeking entirely between Safari and Blob.
-      if (runningOnVercel && published.audioUrl) {
-        verse.audio = published.audioUrl;
+      // For a teacher-published recording, this endpoint resolves to a
+      // short-lived signed private-Blob URL. The browser then reads Blob
+      // directly, preserving byte-range seeking on iOS Safari.
+      if (runningOnVercel) {
+        verse.audio = `api/audio?verse=${verse.n}`;
       }
     } catch {
-      // GitHub Pages and Vercel previews keep the built-in recording/timings
-      // whenever no teacher publish is available.
+      // Keep built-in recording/timings if no teacher publish is available.
     }
   }));
 }
