@@ -1,8 +1,11 @@
 import { put } from '@vercel/blob';
 import { timingSafeEqual } from 'node:crypto';
 
-const VALID_VERSES = new Set(Array.from({ length: 13 }, (_, i) => i + 10));
-const MAX_AUDIO_BYTES = 8 * 1024 * 1024;
+const WORD_COUNTS = {
+  10: 6, 11: 14, 12: 14, 13: 20, 14: 14, 15: 18, 16: 12,
+  17: 13, 18: 13, 19: 8, 20: 18, 21: 8, 22: 13
+};
+const MAX_AUDIO_BYTES = 4 * 1024 * 1024;
 
 function json(body, status = 200) {
   return Response.json(body, {
@@ -28,8 +31,8 @@ function extensionFor(type) {
   return 'webm';
 }
 
-function validateStarts(value) {
-  if (!Array.isArray(value) || !value.length) return null;
+function validateStarts(value, expectedCount) {
+  if (!Array.isArray(value) || value.length !== expectedCount) return null;
   const starts = value.map(Number);
   if (starts.some((v) => !Number.isFinite(v) || v < 0)) return null;
   for (let i = 1; i < starts.length; i += 1) {
@@ -39,6 +42,9 @@ function validateStarts(value) {
 }
 
 export async function POST(request) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return json({ error: 'Vercel Blob is not connected to this project.' }, 503);
+  }
   if (!process.env.TEACHER_PUBLISH_KEY) {
     return json({ error: 'TEACHER_PUBLISH_KEY is not configured on Vercel.' }, 503);
   }
@@ -47,7 +53,9 @@ export async function POST(request) {
   try {
     const form = await request.formData();
     const verse = Number(form.get('verse'));
+    const expectedCount = WORD_COUNTS[verse];
     const audio = form.get('audio');
+    const duration = Number(form.get('duration'));
     let parsedStarts;
 
     try {
@@ -56,30 +64,41 @@ export async function POST(request) {
       return json({ error: 'wordStarts must be valid JSON.' }, 400);
     }
 
-    const wordStarts = validateStarts(parsedStarts);
-    if (!VALID_VERSES.has(verse)) return json({ error: 'Verse must be between 10 and 22.' }, 400);
-    if (!(audio instanceof File) || !audio.type.startsWith('audio/')) return json({ error: 'An audio recording is required.' }, 400);
-    if (!audio.size || audio.size > MAX_AUDIO_BYTES) return json({ error: 'Audio file must be between 1 byte and 8 MB.' }, 400);
-    if (!wordStarts) return json({ error: 'wordStarts must be a non-empty, strictly increasing array.' }, 400);
+    if (!expectedCount) return json({ error: 'Verse must be between 10 and 22.' }, 400);
+    const wordStarts = validateStarts(parsedStarts, expectedCount);
+    if (!wordStarts) {
+      return json({ error: `This passuk requires exactly ${expectedCount} strictly increasing word boundaries.` }, 400);
+    }
+    if (!(audio instanceof File) || !audio.type.startsWith('audio/')) {
+      return json({ error: 'An audio recording is required.' }, 400);
+    }
+    if (!audio.size || audio.size > MAX_AUDIO_BYTES) {
+      return json({ error: 'Audio file must be between 1 byte and 4 MB.' }, 400);
+    }
+    if (Number.isFinite(duration) && duration > 0 && wordStarts.at(-1) > duration + 0.25) {
+      return json({ error: 'The final word boundary is beyond the end of the recording.' }, 400);
+    }
 
     const publishedAt = new Date().toISOString();
-    const stamp = publishedAt.replace(/[:.]/g, '-');
+    const stamp = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
     const root = `vayetsei/rishon/verse-${verse}`;
     const ext = extensionFor(audio.type);
 
     const audioBlob = await put(`${root}/audio-${stamp}.${ext}`, audio, {
       access: 'public',
-      addRandomSuffix: true,
-      contentType: audio.type
+      addRandomSuffix: false,
+      contentType: audio.type,
+      cacheControlMaxAge: 31536000
     });
 
     const metadata = {
-      version: 1,
+      version: 2,
       n: verse,
       wordStarts,
       audioUrl: audioBlob.url,
       audioType: audio.type,
       audioSize: audio.size,
+      duration: Number.isFinite(duration) ? Number(duration.toFixed(3)) : null,
       publishedAt
     };
 
@@ -89,7 +108,8 @@ export async function POST(request) {
       {
         access: 'public',
         addRandomSuffix: false,
-        contentType: 'application/json'
+        contentType: 'application/json',
+        cacheControlMaxAge: 60
       }
     );
 
