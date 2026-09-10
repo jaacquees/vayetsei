@@ -22,3 +22,30 @@ export function scrollText(tikkun) {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+// On Vercel, teacher-published recordings override the bundled fallback audio.
+// Each publish is versioned in Blob storage, so the student app always asks the
+// API for the newest recording without requiring a Git commit or redeploy.
+export async function hydratePublishedRecordings() {
+  if (typeof window === 'undefined') return;
+
+  await Promise.all(verses.map(async (verse) => {
+    try {
+      const response = await fetch(`/api/recording?verse=${verse.n}`, { cache: 'no-store' });
+      if (!response.ok) return;
+      const recording = await response.json();
+      if (!recording?.published || !Array.isArray(recording.wordStarts)) return;
+
+      verse.wordStarts = recording.wordStarts;
+      verse.audio = `api/audio?verse=${verse.n}`;
+      verse.publishedAt = recording.publishedAt;
+      verse.teacherPublished = true;
+    } catch {
+      // GitHub Pages/local fallback continues to use the bundled recordings.
+    }
+  }));
+}
+
+if (typeof window !== 'undefined') {
+  hydratePublishedRecordings();
+}
