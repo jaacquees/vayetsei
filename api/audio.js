@@ -1,4 +1,4 @@
-import { get, list } from '@vercel/blob';
+import { get, issueSignedToken, list, presignUrl } from '@vercel/blob';
 
 const VALID_VERSES = new Set(Array.from({ length: 13 }, (_, i) => i + 10));
 
@@ -32,31 +32,25 @@ export async function GET(request) {
     const metadata = await readJson(newest.pathname);
     if (!metadata?.audioPathname) return Response.redirect(fallback, 302);
 
-    const result = await get(metadata.audioPathname, {
-      access: 'private',
-      ifNoneMatch: request.headers.get('if-none-match') ?? undefined
+    // Do not proxy the audio stream through a Serverless Function. Browsers,
+    // especially iOS Safari, rely on byte-range requests for seekable media.
+    // A short-lived signed Blob URL lets the browser talk directly to Blob,
+    // which preserves normal audio seeking/range behavior while keeping the
+    // underlying store private.
+    const tokenValidUntil = Date.now() + 60 * 60 * 1000;
+    const urlValidUntil = Date.now() + 10 * 60 * 1000;
+    const token = await issueSignedToken({
+      pathname: metadata.audioPathname,
+      operations: ['get'],
+      validUntil: tokenValidUntil
+    });
+    const { presignedUrl } = await presignUrl(token, {
+      pathname: metadata.audioPathname,
+      operation: 'get',
+      validUntil: urlValidUntil
     });
 
-    if (!result) return Response.redirect(fallback, 302);
-    if (result.statusCode === 304) {
-      return new Response(null, {
-        status: 304,
-        headers: {
-          ETag: result.blob.etag,
-          'Cache-Control': 'private, no-cache'
-        }
-      });
-    }
-    if (result.statusCode !== 200) return Response.redirect(fallback, 302);
-
-    return new Response(result.stream, {
-      headers: {
-        'Content-Type': result.blob.contentType || metadata.audioType || 'audio/webm',
-        'X-Content-Type-Options': 'nosniff',
-        ETag: result.blob.etag,
-        'Cache-Control': 'private, no-cache'
-      }
-    });
+    return Response.redirect(presignedUrl, 302);
   } catch (error) {
     console.error('audio lookup failed; using original recording', error);
     return Response.redirect(fallback, 302);
