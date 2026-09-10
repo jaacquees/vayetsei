@@ -1,4 +1,4 @@
-import { list } from '@vercel/blob';
+import { get, list } from '@vercel/blob';
 
 const VALID_VERSES = new Set(Array.from({ length: 13 }, (_, i) => i + 10));
 
@@ -9,11 +9,16 @@ function json(body, status = 200) {
   });
 }
 
+async function readJson(pathname) {
+  const result = await get(pathname, { access: 'private', useCache: false });
+  if (!result || result.statusCode !== 200) return null;
+  return JSON.parse(await new Response(result.stream).text());
+}
+
 export async function GET(request) {
   const url = new URL(request.url);
   const verse = Number(url.searchParams.get('verse'));
   if (!VALID_VERSES.has(verse)) return json({ error: 'Verse must be between 10 and 22.' }, 400);
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ published: false, n: verse }, 404);
 
   try {
     const prefix = `vayetsei/rishon/verse-${verse}/meta-`;
@@ -24,9 +29,8 @@ export async function GET(request) {
       return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
     })[0];
 
-    const response = await fetch(newest.url, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`Could not read metadata (${response.status})`);
-    const recording = await response.json();
+    const recording = await readJson(newest.pathname);
+    if (!recording) return json({ published: false, n: verse }, 404);
 
     return json({ published: true, ...recording });
   } catch (error) {
