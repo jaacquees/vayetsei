@@ -13,6 +13,7 @@ export async function GET(request) {
   const url = new URL(request.url);
   const verse = Number(url.searchParams.get('verse'));
   if (!VALID_VERSES.has(verse)) return json({ error: 'Verse must be between 10 and 22.' }, 400);
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ published: false, n: verse }, 404);
 
   try {
     const prefix = `vayetsei/rishon/verse-${verse}/meta-`;
