@@ -22,10 +22,10 @@ async function loadPublishedRecordings() {
       verse.publishedAt = published.publishedAt || null;
       verse.audioSource = 'published';
 
-      // Only route through the private-Blob audio endpoint when a teacher
-      // recording actually exists. Otherwise keep the built-in static M4A.
-      if (runningOnVercel) {
-        verse.audio = `api/audio?verse=${verse.n}`;
+      // For a teacher-published recording, use the direct signed Blob URL.
+      // This keeps byte-range seeking entirely between Safari and Blob.
+      if (runningOnVercel && published.audioUrl) {
+        verse.audio = published.audioUrl;
       }
     } catch {
       // GitHub Pages and Vercel previews keep the built-in recording/timings
