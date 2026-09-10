@@ -32,27 +32,27 @@ export async function GET(request) {
     const metadata = await readJson(newest.pathname);
     if (!metadata?.audioPathname) return Response.redirect(fallback, 302);
 
-    // Do not proxy the audio stream through a Serverless Function. Browsers,
-    // especially iOS Safari, rely on byte-range requests for seekable media.
-    // A short-lived signed Blob URL lets the browser talk directly to Blob,
-    // which preserves normal audio seeking/range behavior while keeping the
-    // underlying store private.
-    const tokenValidUntil = Date.now() + 60 * 60 * 1000;
-    const urlValidUntil = Date.now() + 10 * 60 * 1000;
     const token = await issueSignedToken({
       pathname: metadata.audioPathname,
       operations: ['get'],
-      validUntil: tokenValidUntil
+      validUntil: Date.now() + 8 * 60 * 60 * 1000
     });
+
     const { presignedUrl } = await presignUrl(token, {
       pathname: metadata.audioPathname,
       operation: 'get',
-      validUntil: urlValidUntil
+      access: 'private',
+      useCache: false,
+      validUntil: Date.now() + 6 * 60 * 60 * 1000
     });
 
     return Response.redirect(presignedUrl, 302);
   } catch (error) {
-    console.error('audio lookup failed; using original recording', error);
+    console.error('audio lookup failed; using original recording', {
+      verse,
+      message: error?.message,
+      stack: error?.stack
+    });
     return Response.redirect(fallback, 302);
   }
 }
