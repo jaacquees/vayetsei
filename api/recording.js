@@ -1,12 +1,8 @@
 import { get, list } from '@vercel/blob';
-
-const VALID_VERSES = new Set(Array.from({ length: 13 }, (_, i) => i + 10));
+import { getVerseByKey, storagePrefixForVerse } from '../src/lib/torahCatalog.js';
 
 function json(body, status = 200) {
-  return Response.json(body, {
-    status,
-    headers: { 'Cache-Control': 'no-store, max-age=0' }
-  });
+  return Response.json(body, { status, headers: { 'Cache-Control': 'no-store, max-age=0' } });
 }
 
 async function readJson(pathname) {
@@ -15,26 +11,30 @@ async function readJson(pathname) {
   return JSON.parse(await new Response(result.stream).text());
 }
 
+function resolveVerse(url) {
+  const verseKey = url.searchParams.get('verseKey');
+  if (verseKey) return getVerseByKey(verseKey);
+  const legacy = Number(url.searchParams.get('verse'));
+  return getVerseByKey(`bereshit:vayetzei:rishon:28:${legacy}`);
+}
+
 export async function GET(request) {
   const url = new URL(request.url);
-  const verse = Number(url.searchParams.get('verse'));
-  if (!VALID_VERSES.has(verse)) return json({ error: 'Verse must be between 10 and 22.' }, 400);
+  const verse = resolveVerse(url);
+  if (!verse) return json({ error: 'Unknown Torah verse.' }, 400);
 
   try {
-    const prefix = `vayetsei/rishon/verse-${verse}/meta-`;
+    const prefix = `${storagePrefixForVerse(verse)}/meta-`;
     const { blobs } = await list({ prefix, limit: 100 });
-    if (!blobs?.length) return json({ published: false, n: verse }, 404);
+    if (!blobs?.length) return json({ published: false, verseKey: verse.key }, 404);
 
-    const newest = [...blobs].sort((a, b) => {
-      return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
-    })[0];
-
+    const newest = [...blobs].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0];
     const recording = await readJson(newest.pathname);
-    if (!recording) return json({ published: false, n: verse }, 404);
+    if (!recording) return json({ published: false, verseKey: verse.key }, 404);
 
-    return json({ published: true, ...recording });
+    return json({ published: true, verseKey: verse.key, aliyahId: verse.aliyahId, chapter: verse.chapter, n: verse.n, ...recording });
   } catch (error) {
-    console.error('recording lookup failed', { verse, message: error?.message, stack: error?.stack });
+    console.error('recording lookup failed', { verseKey: verse.key, message: error?.message, stack: error?.stack });
     return json({ error: error?.message || 'Could not load recording.' }, 500);
   }
 }
