@@ -18,8 +18,6 @@
 
       .align-toggle { display: none !important; }
 
-      /* Use a font designed for niqqud + taamim positioning. This keeps
-         meteg/siluq from colliding with segol in words such as זַרְעֶֽךָ. */
       .hebrew,
       .hebrew .word,
       .verse-ref,
@@ -27,19 +25,10 @@
         font-family: "Taamey Frank CLM", "Noto Serif Hebrew", serif !important;
       }
     </style>
-    <title>Vayetsei Rishon · Tikkun</title>
+    <title>Torah Practice · Tikkun</title>
   </head>
   <body>
     <div id="app"></div>
-    <script>
-      // The instructor alignment editor lives at /vayetsei/adjust/ only.
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('align')) {
-        params.delete('align');
-        const query = params.toString();
-        history.replaceState(null, '', window.location.pathname + (query ? `?${query}` : '') + window.location.hash);
-      }
-    </script>
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/transliterationEnhancer.js"></script>
     <script type="module" src="/src/preciseClipEnhancer.js"></script>
