@@ -45,7 +45,16 @@ document.addEventListener('click', (event) => {
     if (target?.closest('button, input[type="range"]')) cancelMonitor();
     return;
   }
-  const end = Number(wordButton.dataset.wordEnd);
+
+  // Final words deliberately have no next-word boundary. Their data-word-end
+  // attribute is therefore an empty string. Number('') is 0 in JavaScript,
+  // which previously caused the precision monitor to stop final words
+  // immediately. An absent/blank boundary means: let the native audio element
+  // play from the final word's start until the recording naturally ends.
+  const rawEnd = wordButton.dataset.wordEnd;
+  if (rawEnd == null || rawEnd.trim() === '') return cancelMonitor();
+
+  const end = Number(rawEnd);
   if (!Number.isFinite(end)) return cancelMonitor();
   const audio = hiddenPracticeAudio();
   if (audio) monitorWordEnd(audio, end);
