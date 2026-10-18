@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { applyPublished } from './lib/publishedRecordings.js';
   import {
     sefarim, getSefer, getParasha, getAliyah, getParashiotForSefer, getAliyotForParasha,
     getVersesForAliyah, loadSelection, saveSelection, scrollText
@@ -24,16 +25,31 @@
   let audioCurrentTime = 0;
   let timingOverrides = {};
   let notice = '';
+  let recordingsLoading = true;
+  let recordingsError = '';
+  let originalsEnabled = false;
+  let catalogOffline = false;
+  let loadSequence = 0;
+  let offlineStatus = '';
+  let savingOffline = false;
+  let installHelp = false;
+  let installPrompt = null;
+  const baseUrl = import.meta.env.BASE_URL;
+
 
   $: currentSefer = getSefer(selection.seferId);
   $: currentParasha = getParasha(selection.parashaId);
   $: currentAliyah = getAliyah(selection.aliyahId);
   $: selectedVerse = currentVerses.find((v) => v.key === selectedKey) ?? currentVerses[0] ?? null;
 
-  onMount(async () => {
+  onMount(() => {
+    const onInstall = (event) => { event.preventDefault(); installPrompt = event; };
+    window.addEventListener('beforeinstallprompt', onInstall);
+
     selection = loadSelection();
     try { timingOverrides = JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); } catch { timingOverrides = {}; }
-    await loadAliyah(selection.aliyahId, false);
+    loadAliyah(selection.aliyahId, false);
+    return () => window.removeEventListener('beforeinstallprompt', onInstall);
   });
 
   function hebrewNumber(n) {
@@ -50,29 +66,60 @@
   }
 
   function startsFor(verse) {
-    return timingOverrides[verse.key] ?? verse.wordStarts ?? [];
+    return (verse.audioSource === 'original' ? timingOverrides[verse.key] : null) ?? verse.wordStarts ?? [];
   }
 
   function cloneAliyahVerses(aliyahId) {
     return getVersesForAliyah(aliyahId).map((v) => ({ ...v, wordStarts:[...(v.wordStarts || [])] }));
   }
 
-  async function hydratePublished(verses) {
-    if (typeof window === 'undefined') return verses;
-    await Promise.all(verses.map(async (verse) => {
-      try {
-        const response = await fetch(`${import.meta.env.BASE_URL}api/recording?verseKey=${encodeURIComponent(verse.key)}`, { cache:'no-store' });
-        if (!response.ok) return;
-        const data = await response.json();
-        const count = verse.tikkun.trim().split(/\s+/).length;
-        if (!data?.published || !Array.isArray(data.wordStarts) || data.wordStarts.length !== count) return;
-        verse.wordStarts = data.wordStarts.map(Number);
-        verse.audio = `api/audio?verseKey=${encodeURIComponent(verse.key)}`;
-        verse.audioSource = 'published';
-        verse.publishedAt = data.publishedAt || null;
-      } catch {}
-    }));
-    return verses;
+  async function hydratePublished(verses, aliyahId) {
+    const response = await fetch(`${baseUrl}api/recordings?aliyahId=${encodeURIComponent(aliyahId)}`);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Published recordings could not be loaded.');
+    return { verses: applyPublished(verses, data.recordings || {}), offline: response.headers.get('X-Offline-Copy') === 'true' };
+  }
+
+  function enableOriginals() {
+    audio?.pause();
+    audio?.removeAttribute('src');
+    if (audio) delete audio.dataset.verseKey;
+    originalsEnabled = true;
+    currentVerses = cloneAliyahVerses(selection.aliyahId).map(v => ({ ...v, audioSource: 'original' }));
+    notice = '';
+  }
+
+  async function installApp() {
+    if (installPrompt) {
+      await installPrompt.prompt();
+      installPrompt = null;
+    } else installHelp = !installHelp;
+  }
+
+  async function saveOffline() {
+    if (savingOffline || !currentVerses.some(v => v.audioSource === 'published')) return;
+    savingOffline = true;
+    offlineStatus = 'Saving recordings…';
+    try {
+      if (!('serviceWorker' in navigator) || !('caches' in window)) throw new Error('Offline saving is unavailable in this browser.');
+      await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('Offline support is still starting. Reload this page and try again.')), 10000))]);
+      const savedVerses = [...currentVerses];
+      const audioCache = await caches.open('torah-published-audio-v1');
+      let count = 0;
+      for (const verse of savedVerses.filter(v => v.audioSource === 'published')) {
+        const request = new Request(new URL(audioUrl(verse), location.href));
+        if (!(await audioCache.match(request))) {
+          const response = await fetch(request);
+          if (!response.ok || !response.headers.get('Content-Type')?.startsWith('audio/')) throw new Error('A recording could not be saved. Try again when recordings are available.');
+          await audioCache.put(request, response);
+        }
+        count += 1;
+        offlineStatus = `Saved ${count} recordings…`;
+      }
+      await navigator.storage?.persist?.();
+      offlineStatus = `${count} recording${count === 1 ? '' : 's'} saved for offline practice on this device.`;
+    } catch (error) { offlineStatus = error?.message || 'Offline saving failed.'; }
+    finally { savingOffline = false; }
   }
 
   async function loadAliyah(aliyahId, persist = true) {
@@ -85,14 +132,29 @@
     audio?.pause();
     selection = { seferId:sefer.id, parashaId:parasha.id, aliyahId:aliyah.id };
     if (persist) saveSelection(selection);
-    currentVerses = cloneAliyahVerses(aliyah.id);
+    const sequence = ++loadSequence;
+    recordingsLoading = true;
+    recordingsError = '';
+    originalsEnabled = false;
+    catalogOffline = false;
+    offlineStatus = '';
+    if (audio) { audio.removeAttribute('src'); delete audio.dataset.verseKey; }
+    currentVerses = cloneAliyahVerses(aliyah.id).map(v => ({ ...v, audio: null }));
     selectedKey = currentVerses[0]?.key ?? null;
     playingVerseKey = null;
     activeWordIndex = null;
     notice = '';
     screen = 'practice';
     menuOpen = false;
-    currentVerses = await hydratePublished(currentVerses);
+    try {
+      const result = await hydratePublished(cloneAliyahVerses(aliyah.id), aliyah.id);
+      if (sequence !== loadSequence) return;
+      currentVerses = result.verses;
+      catalogOffline = result.offline;
+    } catch (error) {
+      if (sequence !== loadSequence) return;
+      recordingsError = error?.message || 'Published recordings are unavailable.';
+    } finally { if (sequence === loadSequence) recordingsLoading = false; }
   }
 
   function chooseSefer(seferId) {
@@ -120,8 +182,9 @@
   }
 
   async function loadAndSeek(verse, time = 0) {
+    if (recordingsLoading) { notice = 'Loading published recordings…'; return false; }
     if (!audio || !verse?.audio) {
-      notice = 'No recording has been published for this passuk yet.';
+      notice = recordingsError ? 'Published recordings are unavailable. Use Try again above, or explicitly choose the original recordings.' : 'No recording has been published for this passuk yet.';
       return false;
     }
     notice = '';
@@ -134,14 +197,22 @@
       await new Promise((resolve) => {
         if (audio.readyState >= 1) resolve();
         else {
-          const done = () => resolve();
-          audio.addEventListener('loadedmetadata', done, { once:true });
-          audio.addEventListener('error', done, { once:true });
+          const element = audio;
+          const done = () => {
+            clearTimeout(timeout);
+            element.removeEventListener('loadedmetadata', done);
+            element.removeEventListener('error', done);
+            resolve();
+          };
+          const timeout = setTimeout(done, 15000);
+          element.addEventListener('loadedmetadata', done, { once:true });
+          element.addEventListener('error', done, { once:true });
         }
       });
     }
     if (!Number.isFinite(audio.duration)) {
-      notice = 'This recording could not be loaded.';
+      delete audio.dataset.verseKey;
+      notice = 'This published recording could not be loaded. Check your connection or try again later. No original recording has been substituted.';
       return false;
     }
     audioDuration = audio.duration;
@@ -251,7 +322,17 @@
     {#if menuOpen}<button class="scrim" aria-label="Close menu" onclick={() => menuOpen=false}></button>{/if}
     <main>
       <div class="intro"><div><span class="eyebrow">{currentParasha?.name.toUpperCase()} · {currentAliyah?.name.toUpperCase()}</span><h1>Parasha Practice tool</h1></div><p>{currentAliyah?.reference}. Tap a passuk for the full recording, or a word for just that word.</p></div>
-      {#if notice}<div class="notice">{notice}</div>{/if}
+      <div class="practice-tools">
+        <button onclick={installApp}>Add to Home Screen</button>
+        <button onclick={saveOffline} disabled={savingOffline || recordingsLoading || !currentVerses.some(v => v.audioSource === 'published')}>{savingOffline ? 'Saving…' : 'Save for offline practice'}</button>
+      </div>
+      {#if installHelp}<div class="notice" role="status">On iPhone or iPad: open this page in Safari, tap Share, then Add to Home Screen. On Android or desktop: choose Install app in your browser menu.</div>{/if}
+      {#if recordingsLoading}<div class="notice" role="status">Loading published recordings…</div>{/if}
+      {#if recordingsError && !originalsEnabled}<div class="notice recording-warning" role="alert"><strong>Published recordings unavailable</strong><p>{recordingsError}</p><button onclick={() => loadAliyah(selection.aliyahId)}>Try again</button>{#if cloneAliyahVerses(selection.aliyahId).some(v => v.audio)}<button onclick={enableOriginals}>Use original recordings instead</button>{/if}</div>{/if}
+      {#if originalsEnabled}<div class="notice recording-warning" role="status"><strong>Playing the original recordings.</strong> These are the earlier takes, not the re-recordings. <button onclick={() => loadAliyah(selection.aliyahId)}>Try published recordings</button></div>{/if}
+      {#if catalogOffline}<div class="notice" role="status">Using the last saved recording list. Offline playback is available for recordings saved on this device.</div>{/if}
+      {#if offlineStatus}<div class="notice" role="status">{offlineStatus}</div>{/if}
+      {#if notice}<div class="notice" role="status">{notice}</div>{/if}
       <section class="text-card" dir="rtl">
         {#each currentVerses as verse}
           <article data-verse-key={verse.key} class:selected={selectedKey===verse.key}>
@@ -275,6 +356,7 @@
 <style>
   :global(*){box-sizing:border-box}:global(html){scroll-behavior:smooth}:global(body){margin:0;background:#f6f1e7;color:#23231f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}:global(button){font:inherit}
   header{position:sticky;top:0;z-index:20;height:76px;display:flex;align-items:center;gap:12px;padding:0 24px;background:rgba(246,241,231,.96);backdrop-filter:blur(12px);border-bottom:1px solid #d8d0c2}.back,.menu,.play{width:38px;height:38px;border:0;border-radius:50%;background:#243c34;color:#fff;cursor:pointer}.back{font-size:30px;line-height:1}.menu{display:none}.menu:disabled{opacity:.25}.title{display:flex;flex-direction:column;line-height:1.1;margin-right:auto}.title strong{font-family:"Noto Serif Hebrew",Georgia,serif;font-size:19px}.title span{margin-top:5px;color:#746f66;font-size:11px;letter-spacing:.07em;text-transform:uppercase}.controls{display:flex;align-items:center;gap:10px}.segmented{display:flex;padding:3px;background:#e8e0d2;border-radius:11px}.segmented button{border:0;background:transparent;padding:7px 12px;border-radius:8px;cursor:pointer}.segmented button.active{background:#fffdf8;box-shadow:0 1px 5px rgba(0,0,0,.08)}.switch{display:flex;align-items:center;gap:7px;font-size:13px;color:#5f5a51}
+  .practice-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.practice-tools button,.notice button{border:1px solid #c8c0b4;background:#fffdf8;color:#243c34;padding:9px 12px;border-radius:9px;cursor:pointer}.practice-tools button:disabled{opacity:.5;cursor:default}.notice button{margin:6px 8px 0 0}.recording-warning{border-color:#b18a49;background:#fff6df}.recording-warning strong{display:block}.recording-warning p{margin:8px 0}
   .picker{width:min(900px,100%);margin:0 auto;padding:64px 28px 100px}.eyebrow{color:#7f6c45;font-size:11px;font-weight:800;letter-spacing:.16em}.picker h1,.intro h1{margin:10px 0 28px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,6vw,62px);font-weight:500;line-height:1;letter-spacing:-.035em}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.choice{min-height:150px;padding:22px;border:1px solid #d2c7b5;border-radius:18px;background:#fffdf7;box-shadow:0 12px 35px rgba(72,55,29,.06);cursor:pointer;text-align:left}.choice strong{display:block;font-family:"Noto Serif Hebrew",serif;font-size:31px}.choice span{display:block;margin-top:10px;font-size:17px;font-weight:750}.choice small{display:block;margin-top:6px;color:#7b746a;line-height:1.35}.empty,.notice{padding:14px 16px;border:1px solid #d8d0c2;border-radius:12px;background:#fffdf7;color:#6f695f}.notice{margin-bottom:18px}
   .layout{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:calc(100vh - 76px)}aside{position:sticky;top:76px;height:calc(100vh - 76px);border-right:1px solid #d8d0c2;padding:22px 14px;overflow:auto;background:#f1eadf}.aside-title{padding:0 10px 10px;color:#858076;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em}aside button{width:100%;display:grid;grid-template-columns:34px 1fr 24px;align-items:center;gap:5px;padding:11px 10px;border:0;border-radius:10px;background:transparent;text-align:left;cursor:pointer;color:#4b473f}aside button.selected{background:#dce5dc;color:#173c31;font-weight:650}.verse-index{font-size:10px;color:#8c857b}.verse-ref{direction:rtl;text-align:left;font-family:"Noto Serif Hebrew",serif}.mini-play{font-size:10px;opacity:.6}
   main:not(.picker){width:min(1040px,100%);margin:0 auto;padding:58px 54px 100px}.intro{display:grid;grid-template-columns:1.4fr .8fr;align-items:end;gap:40px;margin-bottom:34px}.intro h1{margin-bottom:0}.intro p{margin:0;color:#716b61;font-size:14px;line-height:1.6}.text-card{overflow:hidden;border:1px solid #d2c7b5;border-radius:20px;background:#fffdf7;box-shadow:0 18px 50px rgba(72,55,29,.07)}article{position:relative;display:grid;grid-template-columns:48px 1fr 40px;gap:15px;align-items:start;padding:28px 30px;border-bottom:1px solid #e7dfd2}article:last-child{border-bottom:0}article.selected{background:#eef2e9;box-shadow:inset -4px 0 #527363}.verse-number{width:35px;height:35px;border:1px solid #d7ccbb;border-radius:50%;background:transparent;color:#766b5c;cursor:pointer;font-family:"Noto Serif Hebrew",serif}.hebrew{display:flex;flex-direction:row;flex-wrap:wrap;justify-content:flex-start;gap:9px 11px;font-family:"Taamey Frank CLM","Noto Serif Hebrew","Times New Roman",serif;font-size:clamp(26px,3vw,37px);line-height:1.9}.hebrew.scroll{font-size:clamp(28px,3.2vw,40px);line-height:1.75;letter-spacing:.03em}.word{border:0;padding:0 3px;background:transparent;color:inherit;cursor:pointer;direction:rtl;border-radius:6px;font-family:inherit}.word.active-word{background:#d7e4d5;box-shadow:0 0 0 2px rgba(82,115,99,.14)}.transliteration{margin-top:3px;color:#8d867a;font-size:11px;font-style:italic;text-align:right}.row-play{width:34px;height:34px;border:0;border-radius:50%;background:#eee6d8;color:#425f53;cursor:pointer}.scrim{display:none}

@@ -1,4 +1,6 @@
 import { put } from '@vercel/blob';
+import { dangerouslyDeleteByTag } from '@vercel/functions';
+import { cache, CACHE_KEY, RECORDINGS_TAG } from '../lib/recordings.js';
 import { timingSafeEqual } from 'node:crypto';
 import { getVerseByKey, storagePrefixForVerse } from '../src/lib/torahCatalog.js';
 
@@ -89,7 +91,17 @@ export async function POST(request) {
       access: 'private', addRandomSuffix: false, contentType: 'application/json', cacheControlMaxAge: 60
     });
 
-    return json({ ok: true, recording: metadata, metadataPathname: metadataBlob.pathname }, 201);
+    // Publishing must immediately invalidate both shared data and CDN catalogs.
+    // The take is saved even if cache invalidation fails; never ask for a re-record.
+    let warning = null;
+    try {
+      await cache.delete(CACHE_KEY);
+      await dangerouslyDeleteByTag(RECORDINGS_TAG);
+    } catch (error) {
+      console.error('Recording saved; catalog refresh failed', { message: error?.message });
+      warning = 'Recording saved. The practice catalog may take up to 24 hours to refresh.';
+    }
+    return json({ ok: true, recording: metadata, metadataPathname: metadataBlob.pathname, warning }, 201);
   } catch (error) {
     console.error('publish failed', error);
     return json({ error: error?.message || 'Publish failed.' }, 500);
