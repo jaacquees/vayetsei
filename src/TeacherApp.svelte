@@ -263,7 +263,7 @@
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || `Publish failed (${response.status})`);
       publishStatus = `Published ${verseLabel(selectedVerse)} ✓`;
-      statusText = 'Published. The student practice page will use this recording and these boundaries.';
+      statusText = data.warning || 'Published. The student practice page will use this recording and these boundaries.';
     } catch (error) {
       publishStatus = error?.message || 'Publish failed.';
     }

@@ -1,54 +1,23 @@
-import { get, issueSignedToken, list, presignUrl } from '@vercel/blob';
+import { get } from '@vercel/blob';
+import { audioResponse } from '../lib/audioResponse.js';
 import { getVerseByKey, storagePrefixForVerse } from '../src/lib/torahCatalog.js';
-
-async function readJson(pathname) {
-  const result = await get(pathname, { access: 'private', useCache: false });
-  if (!result || result.statusCode !== 200) return null;
-  return JSON.parse(await new Response(result.stream).text());
-}
-
-function resolveVerse(url) {
-  const verseKey = url.searchParams.get('verseKey');
-  if (verseKey) return getVerseByKey(verseKey);
-  const legacy = Number(url.searchParams.get('verse'));
-  return getVerseByKey(`bereshit:vayetzei:rishon:28:${legacy}`);
-}
-
-function fallbackUrl(request, verse) {
-  if (!verse?.audio) return null;
-  return new URL(`/${verse.audio.replace(/^\//,'')}`, request.url).toString();
-}
+import { loadCatalog, unavailable } from '../lib/recordings.js';
 
 export async function GET(request) {
   const url = new URL(request.url);
-  const verse = resolveVerse(url);
+  const key = url.searchParams.get('verseKey') || `bereshit:vayetzei:rishon:28:${Number(url.searchParams.get('verse'))}`;
+  const verse = getVerseByKey(key);
   if (!verse) return new Response('Unknown Torah verse', { status: 400 });
-  const fallback = fallbackUrl(request, verse);
-
   try {
-    const prefix = `${storagePrefixForVerse(verse)}/meta-`;
-    const { blobs } = await list({ prefix, limit: 100 });
-    if (!blobs?.length) return fallback ? Response.redirect(fallback, 302) : new Response('No recording yet', { status: 404 });
-
-    const newest = [...blobs].sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime())[0];
-    const metadata = await readJson(newest.pathname);
-    if (!metadata?.audioPathname) return fallback ? Response.redirect(fallback, 302) : new Response('No recording yet', { status: 404 });
-
-    const token = await issueSignedToken({
-      pathname: metadata.audioPathname,
-      operations: ['get'],
-      validUntil: Date.now() + 8 * 60 * 60 * 1000
-    });
-    const { presignedUrl } = await presignUrl(token, {
-      pathname: metadata.audioPathname,
-      operation: 'get',
-      access: 'private',
-      useCache: false,
-      validUntil: Date.now() + 6 * 60 * 60 * 1000
-    });
-    return Response.redirect(presignedUrl, 302);
-  } catch (error) {
-    console.error('audio lookup failed', { verseKey: verse.key, message: error?.message, stack: error?.stack });
-    return fallback ? Response.redirect(fallback, 302) : new Response('Audio unavailable', { status: 500 });
-  }
+    // The catalog supplies an immutable version: playback never lists Blob objects.
+    const pathname = url.searchParams.get('pathname') || (await loadCatalog()).recordings[key]?.audioPathname;
+    if (!pathname) return new Response('No recording published', { status: 404 });
+    const prefix = `${storagePrefixForVerse(verse)}/audio-`;
+    if (!pathname.startsWith(prefix) || !/^[\w/.-]+$/.test(pathname) || pathname.includes('..')) {
+      return new Response('Invalid recording path', { status: 400 });
+    }
+    const result = await get(pathname, { access: 'private' });
+    if (!result || result.statusCode !== 200) return new Response('Recording unavailable', { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return audioResponse(result, request, url.searchParams.has('pathname'));
+  } catch (error) { return unavailable(error); }
 }
