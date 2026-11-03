@@ -20,7 +20,7 @@
     ['ו','Vav','v as in very'],['ז','Zayin','z as in zebra'],['ח','‘Het','‘H, a throaty sound'],
     ['ט','Tet','t as in top'],['י','Yod','y as in yes'],['כּ','Kaf','k as in kite'],
     ['כ','Khaf','‘H, a throaty sound'],['ל','Lamed','l as in lamp'],['מ','Mem','m as in moon'],
-    ['נ','Nun','n as in nose'],['ס','Samekh','s as in sun'],['ע','Ayin','Usually silent in modern Hebrew; carries a vowel'],
+    ['נ','Nun','n as in nose'],['ס','Same’h','s as in sun'],['ע','Ayin','Usually silent in modern Hebrew; carries a vowel'],
     ['פּ','Pe','p as in pen'],['פ','Fe','f as in fish'],['צ','Tzadik','ts as in cats'],
     ['ק','Qof','k as in kite'],['ר','Resh','r'],['שׁ','Shin','sh as in ship'],
     ['שׂ','Sin','s as in sun'],['ת','Tav','t as in top']
