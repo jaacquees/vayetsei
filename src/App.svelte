@@ -286,6 +286,7 @@
     <strong>{currentParasha?.hebrew || 'תּוֹרָה'} · {currentAliyah?.hebrew || ''}</strong>
     <span>{currentSefer?.name || 'Torah'} · {currentParasha?.name || ''}{currentAliyah ? ` · ${currentAliyah.name}` : ''}</span>
   </div>
+  <a href={`${import.meta.env.BASE_URL}alphabet/`} style="color:#243c34;font-size:14px;font-weight:700">Aleph–Bet</a>
   {#if screen === 'practice'}
     <div class="controls">
       <div class="segmented"><button class:active={mode==='tikkun'} onclick={() => mode='tikkun'}>Tikkun</button><button class:active={mode==='scroll'} onclick={() => mode='scroll'}>Torah</button></div>
