@@ -10,7 +10,7 @@ export default defineConfig({
     generateBundle: { order: 'post', handler(options, bundle) {
       const base = process.env.VERCEL ? '/' : '/vayetsei/';
       const files = Object.keys(bundle).filter(name => /\.(js|css)$/.test(name));
-      const precache = [base, `${base}manifest.webmanifest`, `${base}icons/icon-192.png`, ...files.map(name => `${base}${name}`)];
+      const precache = [base, `${base}manifest.webmanifest`, `${base}alphabet/`, `${base}icons/icon-180.png`, `${base}icons/icon-512.png`, `${base}icons/icon-maskable-512.png`, `${base}icons/icon-192.png`, ...files.map(name => `${base}${name}`)];
       const template = readFileSync('src/service-worker.js', 'utf8');
       const buildId = createHash('sha256').update(template + JSON.stringify(files)).digest('hex').slice(0, 12);
       this.emitFile({ type: 'asset', fileName: 'sw.js', source: template.replace('__BUILD_ID__', buildId).replace('__PRECACHE__', JSON.stringify(precache)) });

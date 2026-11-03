@@ -285,7 +285,7 @@
   {#if screen !== 'sefarim'}<button class="back" aria-label="Back" onclick={goBack}>‹</button>{/if}
   <button class="menu" aria-label="Open pessukim" onclick={() => menuOpen=!menuOpen} disabled={screen !== 'practice'}>☰</button>
   <div class="title">
-    <strong>{currentParasha?.hebrew || 'תּוֹרָה'} · {currentAliyah?.hebrew || ''}</strong>
+    <strong>Lev Lamed</strong>
     <span>{currentSefer?.name || 'Torah'} · {currentParasha?.name || ''}{currentAliyah ? ` · ${currentAliyah.name}` : ''}</span>
   </div>
   <button class="alphabet-nav" onclick={() => { audio?.pause(); menuOpen = false; screen = screen === 'alphabet' ? 'practice' : 'alphabet'; }} aria-pressed={screen === 'alphabet'}>א · Alphabet</button>
