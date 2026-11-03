@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import Alphabet from './Alphabet.svelte';
   import { applyPublished } from './lib/publishedRecordings.js';
   import {
     sefarim, getSefer, getParasha, getAliyah, getParashiotForSefer, getAliyotForParasha,
@@ -170,7 +171,8 @@
   }
 
   function goBack() {
-    if (screen === 'practice') screen = 'aliyot';
+    if (screen === 'alphabet') screen = 'practice';
+    else if (screen === 'practice') screen = 'aliyot';
     else if (screen === 'aliyot') screen = 'parashiot';
     else if (screen === 'parashiot') screen = 'sefarim';
   }
@@ -286,7 +288,7 @@
     <strong>{currentParasha?.hebrew || 'תּוֹרָה'} · {currentAliyah?.hebrew || ''}</strong>
     <span>{currentSefer?.name || 'Torah'} · {currentParasha?.name || ''}{currentAliyah ? ` · ${currentAliyah.name}` : ''}</span>
   </div>
-  <a href={`${import.meta.env.BASE_URL}alphabet/`} style="color:#243c34;font-size:14px;font-weight:700">Aleph–Bet</a>
+  <button class="alphabet-nav" onclick={() => { audio?.pause(); menuOpen = false; screen = screen === 'alphabet' ? 'practice' : 'alphabet'; }} aria-pressed={screen === 'alphabet'}>א · Alphabet</button>
   {#if screen === 'practice'}
     <div class="controls">
       <div class="segmented"><button class:active={mode==='tikkun'} onclick={() => mode='tikkun'}>Tikkun</button><button class:active={mode==='scroll'} onclick={() => mode='scroll'}>Torah</button></div>
@@ -296,7 +298,9 @@
   {/if}
 </header>
 
-{#if screen === 'sefarim'}
+{#if screen === 'alphabet'}
+  <Alphabet />
+{:else if screen === 'sefarim'}
   <main class="picker"><span class="eyebrow">TORAH LIBRARY</span><h1>Choose a Sefer</h1><div class="grid">
     {#each sefarim as sefer}<button class="choice" onclick={() => chooseSefer(sefer.id)}><strong dir="rtl">{sefer.hebrew}</strong><span>{sefer.name}</span><small>{sefer.english}</small></button>{/each}
   </div></main>
@@ -355,6 +359,8 @@
 {/if}
 
 <style>
+  .alphabet-nav{border:1px solid #c8c0b4;border-radius:10px;background:#fffdf8;color:#243c34;padding:8px;cursor:pointer;font-size:13px} .alphabet-nav[aria-pressed="true"]{background:#dce5dc}
+
   :global(*){box-sizing:border-box}:global(html){scroll-behavior:smooth}:global(body){margin:0;background:#f6f1e7;color:#23231f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}:global(button){font:inherit}
   header{position:sticky;top:0;z-index:20;height:76px;display:flex;align-items:center;gap:12px;padding:0 24px;background:rgba(246,241,231,.96);backdrop-filter:blur(12px);border-bottom:1px solid #d8d0c2}.back,.menu,.play{width:38px;height:38px;border:0;border-radius:50%;background:#243c34;color:#fff;cursor:pointer}.back{font-size:30px;line-height:1}.menu{display:none}.menu:disabled{opacity:.25}.title{display:flex;flex-direction:column;line-height:1.1;margin-right:auto}.title strong{font-family:"Noto Serif Hebrew",Georgia,serif;font-size:19px}.title span{margin-top:5px;color:#746f66;font-size:11px;letter-spacing:.07em;text-transform:uppercase}.controls{display:flex;align-items:center;gap:10px}.segmented{display:flex;padding:3px;background:#e8e0d2;border-radius:11px}.segmented button{border:0;background:transparent;padding:7px 12px;border-radius:8px;cursor:pointer}.segmented button.active{background:#fffdf8;box-shadow:0 1px 5px rgba(0,0,0,.08)}.switch{display:flex;align-items:center;gap:7px;font-size:13px;color:#5f5a51}
   .practice-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}.practice-tools button,.notice button{border:1px solid #c8c0b4;background:#fffdf8;color:#243c34;padding:9px 12px;border-radius:9px;cursor:pointer}.practice-tools button:disabled{opacity:.5;cursor:default}.notice button{margin:6px 8px 0 0}.recording-warning{border-color:#b18a49;background:#fff6df}.recording-warning strong{display:block}.recording-warning p{margin:8px 0}
