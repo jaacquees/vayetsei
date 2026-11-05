@@ -50,9 +50,14 @@
     const onInstall = (event) => { event.preventDefault(); installPrompt = event; };
     window.addEventListener('beforeinstallprompt', onInstall);
 
-    selection = loadSelection();
+    const saved = loadSelection(null);
+    if (saved) selection = saved;
     try { timingOverrides = JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); } catch { timingOverrides = {}; }
-    recordingsLoading = false;
+    if (saved) {
+      const destination = saved.screen || 'practice';
+      if (destination === 'practice') loadAliyah(saved.aliyahId, false);
+      else { screen = ['parashiot', 'aliyot', 'alphabet'].includes(destination) ? destination : 'parashiot'; recordingsLoading = false; }
+    } else recordingsLoading = false;
     return () => window.removeEventListener('beforeinstallprompt', onInstall);
   });
 
@@ -139,7 +144,7 @@
     playback.stop();
     audio?.pause();
     selection = { seferId:sefer.id, parashaId:parasha.id, aliyahId:aliyah.id };
-    if (persist) saveSelection(selection);
+    if (persist) saveSelection({ ...selection, screen: 'practice' });
     const sequence = ++loadSequence;
     recordingsLoading = true;
     recordingsError = '';
@@ -176,7 +181,7 @@
     const parasha = getParasha(parashaId);
     if (!parasha) return;
     const remembered = getAliyah(selection.aliyahId);
-    selection = saveSelection({ seferId: parasha.seferId, parashaId, aliyahId: remembered?.parashaId === parashaId ? remembered.id : getAliyotForParasha(parashaId)[0]?.id });
+    selection = saveSelection({ screen: 'aliyot', seferId: parasha.seferId, parashaId, aliyahId: remembered?.parashaId === parashaId ? remembered.id : getAliyotForParasha(parashaId)[0]?.id });
     screen = 'aliyot';
   }
 
@@ -185,6 +190,7 @@
     else if (screen === 'practice') screen = 'aliyot';
     else if (screen === 'aliyot') screen = 'parashiot';
     else if (screen === 'parashiot') screen = 'sefarim';
+    saveSelection({ ...selection, screen });
   }
 
   function audioUrl(verse) {

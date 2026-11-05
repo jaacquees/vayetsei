@@ -1116,7 +1116,7 @@ function validSelection(selection) {
   return parasha && aliyah && parasha.seferId === selection.seferId && aliyah.parashaId === parasha.id;
 }
 
-export function loadSelection() {
+export function loadSelection(fallback = DEFAULT_SELECTION) {
   try {
     const cookie = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith(`${SELECTION_STORAGE_KEY}=`));
     const parsed = cookie && JSON.parse(decodeURIComponent(cookie.slice(SELECTION_STORAGE_KEY.length + 1)));
@@ -1126,7 +1126,7 @@ export function loadSelection() {
     const parsed = JSON.parse(localStorage.getItem(SELECTION_STORAGE_KEY) || 'null');
     if (validSelection(parsed)) return saveSelection(parsed);
   } catch {}
-  return { ...DEFAULT_SELECTION };
+  return fallback ? { ...fallback } : null;
 }
 
 export function saveSelection(selection) {
