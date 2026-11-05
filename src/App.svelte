@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import Alphabet from './Alphabet.svelte';
+  import { createPlaybackController } from './lib/playback.js';
   import { applyPublished } from './lib/publishedRecordings.js';
   import {
     sefarim, parashiot, getSefer, getParasha, getAliyah, getParashiotForSefer, getAliyotForParasha,
@@ -9,6 +10,8 @@
 
   const OVERRIDES_KEY = 'torah-practice-alignment-overrides-v2';
 
+  const playback = createPlaybackController();
+  let playbackSequence = 0;
   let mode = 'tikkun';
   let showTransliteration = false;
   let menuOpen = false;
@@ -82,6 +85,8 @@
   }
 
   function enableOriginals() {
+    playbackSequence += 1;
+    playback.stop();
     audio?.pause();
     audio?.removeAttribute('src');
     if (audio) delete audio.dataset.verseKey;
@@ -130,6 +135,8 @@
     const sefer = parasha ? getSefer(parasha.seferId) : null;
     if (!parasha || !sefer) return;
 
+    playbackSequence += 1;
+    playback.stop();
     audio?.pause();
     selection = { seferId:sefer.id, parashaId:parasha.id, aliyahId:aliyah.id };
     if (persist) saveSelection(selection);
@@ -193,37 +200,21 @@
       return false;
     }
     notice = '';
-    const src = audioUrl(verse);
-    const identity = verse.key;
-    if (audio.dataset.verseKey !== identity) {
-      audio.pause();
-      audio.src = src;
-      audio.dataset.verseKey = identity;
-      await new Promise((resolve) => {
-        if (audio.readyState >= 1) resolve();
-        else {
-          const element = audio;
-          const done = () => {
-            clearTimeout(timeout);
-            element.removeEventListener('loadedmetadata', done);
-            element.removeEventListener('error', done);
-            resolve();
-          };
-          const timeout = setTimeout(done, 15000);
-          element.addEventListener('loadedmetadata', done, { once:true });
-          element.addEventListener('error', done, { once:true });
-        }
-      });
-    }
-    if (!Number.isFinite(audio.duration)) {
-      delete audio.dataset.verseKey;
-      notice = 'This published recording could not be loaded. Check your connection or try again later. No original recording has been substituted.';
+    const sequence = ++playbackSequence;
+    try {
+      await playback.play(audio, audioUrl(verse), verse.key, time);
+      if (sequence !== playbackSequence) return false;
+      audioDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
+      audioCurrentTime = audio.currentTime;
+      return true;
+    } catch (error) {
+      if (sequence !== playbackSequence || error?.name === 'AbortError') return false;
+      isPlaying = false;
+      notice = error?.name === 'NotAllowedError'
+        ? 'Your browser blocked playback. Tap Play to try again.'
+        : 'This recording could not be played. Check your connection and try again.';
       return false;
     }
-    audioDuration = audio.duration;
-    audio.currentTime = Math.max(0, Math.min(time, audioDuration));
-    audioCurrentTime = audio.currentTime;
-    return true;
   }
 
   async function playVerse(verse) {
@@ -235,7 +226,7 @@
     activeWordIndex = null;
     const first = startsFor(verse)[0] ?? 0;
     if (!(await loadAndSeek(verse, first))) return;
-    try { await audio.play(); isPlaying = true; } catch { isPlaying = false; }
+    isPlaying = !audio.paused;
     document.querySelector(`[data-verse-key="${CSS.escape(verse.key)}"]`)?.scrollIntoView({ behavior:'smooth', block:'center' });
   }
 
@@ -249,16 +240,20 @@
     playingVerseKey = verse.key;
     activeWordIndex = index;
     clippedWordIndex = index;
+    wordClipEnd = null;
     if (!(await loadAndSeek(verse, starts[index]))) return;
     const next = starts[index + 1];
     wordClipEnd = next == null ? audio.duration : Math.min(audio.duration, next);
-    try { await audio.play(); isPlaying = true; } catch { isPlaying = false; }
+    isPlaying = !audio.paused;
   }
 
   function togglePlayback() {
     if (!selectedVerse) return;
     if (!audio?.src || playingVerseKey !== selectedVerse.key || clippedWordIndex != null) return playVerse(selectedVerse);
-    if (audio.paused) audio.play(); else audio.pause();
+    if (audio.paused) {
+      notice = '';
+      audio.play().catch(() => { notice = 'This recording could not be played. Tap Play to try again.'; });
+    } else { playbackSequence += 1; playback.stop(); audio.pause(); }
   }
 
   function handleTimeUpdate() {
