@@ -35,7 +35,7 @@ export function createPlaybackController() {
           resolve();
         } catch (error) { reject(error); }
       };
-      cancelPending = () => reject(new DOMException('Playback superseded', 'AbortError'));
+      cancelPending = () => { cleanup(); reject(new DOMException('Playback superseded', 'AbortError')); };
       media.addEventListener('loadedmetadata', seek);
       media.addEventListener('error', failed);
       timer = setTimeout(() => reject(new Error('The recording took too long to load.')), 15000);
