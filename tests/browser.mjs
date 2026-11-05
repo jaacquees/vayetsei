@@ -34,6 +34,10 @@ const server = createServer(async (req,res) => {
 await new Promise(r => server.listen(0,'127.0.0.1',r));
 const origin = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({headless:true, ...(process.env.CHROMIUM_EXECUTABLE ? {executablePath:process.env.CHROMIUM_EXECUTABLE, args:['--no-sandbox','--disable-dev-shm-usage']} : {})});
+async function openRishon(page) {
+  await page.getByRole('button', { name: /Vayetzei/ }).click();
+  await page.getByRole('button', { name: /Rishon/ }).click();
+}
 try {
   // A fresh install during suspension must not play an embedded recording.
   suspended = true;
@@ -41,6 +45,15 @@ try {
   await failed.route('https://**', route => route.abort());
   const page = await failed.newPage();
   await page.goto(origin);
+  await page.getByRole('heading', { name: 'Choose a Parasha', exact: true }).waitFor();
+  assert.equal(catalogs, 0);
+  await page.getByRole('button', { name: /Ki-Tetse/ }).click();
+  await page.getByRole('heading', { name: 'Choose an Aliyah', exact: true }).waitFor();
+  assert((await failed.cookies()).some(c => c.name === 'torah-practice-selection-v1' && decodeURIComponent(c.value).includes('ki-tetse')));
+  await page.reload();
+  await page.getByRole('heading', { name: 'Choose a Parasha', exact: true }).waitFor();
+  await page.locator('.choice.remembered').filter({ hasText: 'Ki-Tetse' }).waitFor();
+  await openRishon(page);
   await page.getByRole('alert').waitFor();
   assert.equal(catalogs, 1);
   await page.locator('article .row-play').first().click();
@@ -64,6 +77,7 @@ try {
   console.log('Worker check:', await p.evaluate(async () => ({available:'serviceWorker' in navigator, registrations:(await navigator.serviceWorker.getRegistrations()).map(r => ({scope:r.scope, active:r.active?.state, installing:r.installing?.state})), readyState:document.readyState})));
   await p.waitForFunction(() => 'serviceWorker' in navigator && navigator.serviceWorker.controller);
   await p.reload();
+  await openRishon(p);
   await p.getByRole('button',{name:'Save for offline practice'}).click();
   await p.getByText('1 recording saved for offline practice on this device.').waitFor();
   const manifest = await p.evaluate(async () => (await fetch('/manifest.webmanifest')).json());
@@ -71,6 +85,7 @@ try {
   const beforeReads = audioReads;
   await context.setOffline(true);
   await p.reload();
+  await openRishon(p);
   await p.getByText(/Using the last saved recording list/).waitFor();
   await p.locator('article .row-play').first().click();
   await p.waitForFunction(() => document.querySelector('audio').readyState >= 1);

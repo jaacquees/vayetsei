@@ -3,7 +3,7 @@
   import Alphabet from './Alphabet.svelte';
   import { applyPublished } from './lib/publishedRecordings.js';
   import {
-    sefarim, getSefer, getParasha, getAliyah, getParashiotForSefer, getAliyotForParasha,
+    sefarim, parashiot, getSefer, getParasha, getAliyah, getParashiotForSefer, getAliyotForParasha,
     getVersesForAliyah, loadSelection, saveSelection, scrollText
   } from './lib/torahCatalog.js';
 
@@ -12,7 +12,7 @@
   let mode = 'tikkun';
   let showTransliteration = false;
   let menuOpen = false;
-  let screen = 'practice';
+  let screen = 'parashiot';
   let selection = { seferId:'bereshit', parashaId:'vayetzei', aliyahId:'vayetzei-rishon' };
   let currentVerses = [];
   let selectedKey = null;
@@ -49,7 +49,7 @@
 
     selection = loadSelection();
     try { timingOverrides = JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); } catch { timingOverrides = {}; }
-    loadAliyah(selection.aliyahId, false);
+    recordingsLoading = false;
     return () => window.removeEventListener('beforeinstallprompt', onInstall);
   });
 
@@ -166,7 +166,10 @@
   }
 
   function chooseParasha(parashaId) {
-    selection = { ...selection, parashaId };
+    const parasha = getParasha(parashaId);
+    if (!parasha) return;
+    const remembered = getAliyah(selection.aliyahId);
+    selection = saveSelection({ seferId: parasha.seferId, parashaId, aliyahId: remembered?.parashaId === parashaId ? remembered.id : getAliyotForParasha(parashaId)[0]?.id });
     screen = 'aliyot';
   }
 
@@ -305,14 +308,14 @@
     {#each sefarim as sefer}<button class="choice" onclick={() => chooseSefer(sefer.id)}><strong dir="rtl">{sefer.hebrew}</strong><span>{sefer.name}</span><small>{sefer.english}</small></button>{/each}
   </div></main>
 {:else if screen === 'parashiot'}
-  <main class="picker"><span class="eyebrow">{currentSefer?.name}</span><h1>Choose a Parasha</h1>
-    {#if getParashiotForSefer(selection.seferId).length}
-      <div class="grid">{#each getParashiotForSefer(selection.seferId) as p}<button class="choice" onclick={() => chooseParasha(p.id)}><strong dir="rtl">{p.hebrew}</strong><span>{p.name}</span><small>{p.reference}</small></button>{/each}</div>
+  <main class="picker"><span class="eyebrow">TORAH LIBRARY</span><h1>Choose a Parasha</h1>
+    {#if parashiot.length}
+      <div class="grid">{#each parashiot as p}<button class="choice" class:remembered={selection.parashaId === p.id} onclick={() => chooseParasha(p.id)}><strong dir="rtl">{p.hebrew}</strong><span>{p.name}</span><small>{getSefer(p.seferId)?.name} · {p.reference}</small>{#if selection.parashaId === p.id}<small>Current choice</small>{/if}</button>{/each}</div>
     {:else}<div class="empty">No parashiot have been added to this Sefer yet.</div>{/if}
   </main>
 {:else if screen === 'aliyot'}
   <main class="picker"><span class="eyebrow">{currentSefer?.name} · {currentParasha?.name}</span><h1>Choose an Aliyah</h1><div class="grid">
-    {#each getAliyotForParasha(selection.parashaId) as a}<button class="choice" onclick={() => loadAliyah(a.id)}><strong dir="rtl">{a.hebrew}</strong><span>{a.name}</span><small>{a.reference}</small></button>{/each}
+    {#each getAliyotForParasha(selection.parashaId) as a}<button class="choice" class:remembered={selection.aliyahId === a.id} onclick={() => loadAliyah(a.id)}><strong dir="rtl">{a.hebrew}</strong><span>{a.name}</span><small>{a.reference}</small></button>{/each}
   </div></main>
 {:else}
   <div class="layout">
@@ -359,6 +362,7 @@
 {/if}
 
 <style>
+  .choice.remembered{border-color:#527363;background:#eef2e9}
   .alphabet-nav{border:1px solid #c8c0b4;border-radius:10px;background:#fffdf8;color:#243c34;padding:8px;cursor:pointer;font-size:13px} .alphabet-nav[aria-pressed="true"]{background:#dce5dc}
 
   :global(*){box-sizing:border-box}:global(html){scroll-behavior:smooth}:global(body){margin:0;background:#f6f1e7;color:#23231f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}:global(button){font:inherit}

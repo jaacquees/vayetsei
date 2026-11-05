@@ -1110,17 +1110,32 @@ export function getAliyotForParasha(parashaId) { return aliyot.filter((item) => 
 export function getVersesForAliyah(aliyahId) { return verses.filter((item) => item.aliyahId === aliyahId); }
 export function getVerseByKey(key) { return verses.find((item) => item.key === key) || null; }
 
+function validSelection(selection) {
+  const parasha = getParasha(selection?.parashaId);
+  const aliyah = getAliyah(selection?.aliyahId);
+  return parasha && aliyah && parasha.seferId === selection.seferId && aliyah.parashaId === parasha.id;
+}
+
 export function loadSelection() {
   try {
+    const cookie = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith(`${SELECTION_STORAGE_KEY}=`));
+    const parsed = cookie && JSON.parse(decodeURIComponent(cookie.slice(SELECTION_STORAGE_KEY.length + 1)));
+    if (validSelection(parsed)) return parsed;
+  } catch {}
+  try {
     const parsed = JSON.parse(localStorage.getItem(SELECTION_STORAGE_KEY) || 'null');
-    if (parsed && getSefer(parsed.seferId) && getParasha(parsed.parashaId) && getAliyah(parsed.aliyahId)) return parsed;
+    if (validSelection(parsed)) return saveSelection(parsed);
   } catch {}
   return { ...DEFAULT_SELECTION };
 }
 
 export function saveSelection(selection) {
   const next = { ...DEFAULT_SELECTION, ...selection };
+  if (!validSelection(next)) return { ...DEFAULT_SELECTION };
   try { localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(next)); } catch {}
+  try {
+    document.cookie = `${SELECTION_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(next))}; Max-Age=31536000; Path=/; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`;
+  } catch {}
   return next;
 }
 
