@@ -285,7 +285,7 @@
 <audio bind:this={audio} onplay={() => isPlaying=true} onpause={() => isPlaying=false} onended={finishPlayback} ontimeupdate={handleTimeUpdate}></audio>
 
 <header>
-  {#if screen !== 'sefarim'}<button class="back" aria-label="Back" onclick={goBack}>‹</button>{/if}
+  {#if screen !== 'sefarim' && screen !== 'parashiot'}<button class="back" aria-label="Back" onclick={goBack}>‹</button>{/if}
   <button class="menu" aria-label="Open pessukim" onclick={() => menuOpen=!menuOpen} disabled={screen !== 'practice'}>☰</button>
   <div class="title">
     <strong>Lev Lamed</strong>
