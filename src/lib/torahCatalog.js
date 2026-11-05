@@ -7,13 +7,21 @@ export const sefarim = [
 ];
 
 export const parashiot = [
-  { id: 'vayetzei', seferId: 'bereshit', order: 7, name: 'Vayetzei', hebrew: 'וַיֵּצֵא', reference: 'Genesis 28:10–32:3' }
+  { id: 'vayetzei', seferId: 'bereshit', order: 7, name: 'Vayetzei', hebrew: 'וַיֵּצֵא', reference: 'Genesis 28:10–32:3' },
+  { id: 'ki-tetse', seferId: 'devarim', order: 49, name: 'Ki-Tetse', hebrew: 'כִּי תֵצֵא', reference: 'Deuteronomy 21:10–25:19' }
 ];
 
 export const aliyot = [
   { id: 'vayetzei-rishon', parashaId: 'vayetzei', order: 1, name: 'Rishon', hebrew: 'רִאשׁוֹן', reference: 'Genesis 28:10–22' },
   { id: 'vayetzei-sheni', parashaId: 'vayetzei', order: 2, name: 'Sheni', hebrew: 'שֵׁנִי', reference: 'Genesis 29:1–17' },
-  { id: 'vayetzei-shelishi', parashaId: 'vayetzei', order: 3, name: 'Shelishi', hebrew: 'שְׁלִישִׁי', reference: 'Genesis 29:18–30:13' }
+  { id: 'vayetzei-shelishi', parashaId: 'vayetzei', order: 3, name: 'Shelishi', hebrew: 'שְׁלִישִׁי', reference: 'Genesis 29:18–30:13' },
+  { id: 'ki-tetse-rishon', parashaId: 'ki-tetse', order: 1, name: 'Rishon', hebrew: 'רִאשׁוֹן', reference: 'Deuteronomy 21:10–21' },
+  { id: 'ki-tetse-sheni', parashaId: 'ki-tetse', order: 2, name: 'Sheni', hebrew: 'שֵׁנִי', reference: 'Deuteronomy 21:22–22:7' },
+  { id: 'ki-tetse-shelishi', parashaId: 'ki-tetse', order: 3, name: 'Shelishi', hebrew: 'שְׁלִישִׁי', reference: 'Deuteronomy 22:8–23:7' },
+  { id: 'ki-tetse-revii', parashaId: 'ki-tetse', order: 4, name: 'Revii', hebrew: 'רְבִיעִי', reference: 'Deuteronomy 23:8–24' },
+  { id: 'ki-tetse-chamishi', parashaId: 'ki-tetse', order: 5, name: 'Chamishi', hebrew: 'חֲמִישִׁי', reference: 'Deuteronomy 23:25–24:4' },
+  { id: 'ki-tetse-shishi', parashaId: 'ki-tetse', order: 6, name: 'Shishi', hebrew: 'שִׁשִּׁי', reference: 'Deuteronomy 24:5–13' },
+  { id: 'ki-tetse-shevii', parashaId: 'ki-tetse', order: 7, name: 'Shevii', hebrew: 'שְׁבִיעִי', reference: 'Deuteronomy 24:14–25:19' }
 ];
 
 const rishon = [
@@ -89,10 +97,1007 @@ const shelishiTexts = [
 const sheni = sheniTexts.map(([n,tikkun]) => ({ aliyahId:'vayetzei-sheni', chapter:29, n, tikkun, audio:null, wordStarts:[] }));
 const shelishi = shelishiTexts.map(([chapter,n,tikkun]) => ({ aliyahId:'vayetzei-shelishi', chapter, n, tikkun, audio:null, wordStarts:[] }));
 
+// Hebrew text: Sefaria, Miqra according to the Masorah (CC BY-SA).
+// https://www.sefaria.org/Deuteronomy.21.10-25.19
+const kiTetse = [
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 10,
+    "tikkun": "כִּֽי־תֵצֵ֥א לַמִּלְחָמָ֖ה עַל־אֹיְבֶ֑יךָ וּנְתָנ֞וֹ יְהֹוָ֧ה אֱלֹהֶ֛יךָ בְּיָדֶ֖ךָ וְשָׁבִ֥יתָ שִׁבְיֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:10"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 11,
+    "tikkun": "וְרָאִ֙יתָ֙ בַּשִּׁבְיָ֔ה אֵ֖שֶׁת יְפַת־תֹּ֑אַר וְחָשַׁקְתָּ֣ בָ֔הּ וְלָקַחְתָּ֥ לְךָ֖ לְאִשָּֽׁה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:11"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 12,
+    "tikkun": "וַהֲבֵאתָ֖הּ אֶל־תּ֣וֹךְ בֵּיתֶ֑ךָ וְגִלְּחָה֙ אֶת־רֹאשָׁ֔הּ וְעָשְׂתָ֖ה אֶת־צִפׇּרְנֶֽיהָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:12"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 13,
+    "tikkun": "וְהֵסִ֩ירָה֩ אֶת־שִׂמְלַ֨ת שִׁבְיָ֜הּ מֵעָלֶ֗יהָ וְיָֽשְׁבָה֙ בְּבֵיתֶ֔ךָ וּבָ֥כְתָ֛ה אֶת־אָבִ֥יהָ וְאֶת־אִמָּ֖הּ יֶ֣רַח יָמִ֑ים וְאַ֨חַר כֵּ֜ן תָּב֤וֹא אֵלֶ֙יהָ֙ וּבְעַלְתָּ֔הּ וְהָיְתָ֥ה לְךָ֖ לְאִשָּֽׁה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:13"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 14,
+    "tikkun": "וְהָיָ֞ה אִם־לֹ֧א חָפַ֣צְתָּ בָּ֗הּ וְשִׁלַּחְתָּהּ֙ לְנַפְשָׁ֔הּ וּמָכֹ֥ר לֹא־תִמְכְּרֶ֖נָּה בַּכָּ֑סֶף לֹא־תִתְעַמֵּ֣ר בָּ֔הּ תַּ֖חַת אֲשֶׁ֥ר עִנִּיתָֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:14"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 15,
+    "tikkun": "כִּֽי־תִהְיֶ֨יןָ לְאִ֜ישׁ שְׁתֵּ֣י נָשִׁ֗ים הָאַחַ֤ת אֲהוּבָה֙ וְהָאַחַ֣ת שְׂנוּאָ֔ה וְיָֽלְדוּ־ל֣וֹ בָנִ֔ים הָאֲהוּבָ֖ה וְהַשְּׂנוּאָ֑ה וְהָיָ֛ה הַבֵּ֥ן הַבְּכֹ֖ר לַשְּׂנִיאָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:15"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 16,
+    "tikkun": "וְהָיָ֗ה בְּיוֹם֙ הַנְחִיל֣וֹ אֶת־בָּנָ֔יו אֵ֥ת אֲשֶׁר־יִהְיֶ֖ה ל֑וֹ לֹ֣א יוּכַ֗ל לְבַכֵּר֙ אֶת־בֶּן־הָ֣אֲהוּבָ֔ה עַל־פְּנֵ֥י בֶן־הַשְּׂנוּאָ֖ה הַבְּכֹֽר׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:16"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 17,
+    "tikkun": "כִּי֩ אֶת־הַבְּכֹ֨ר בֶּן־הַשְּׂנוּאָ֜ה יַכִּ֗יר לָ֤תֶת לוֹ֙ פִּ֣י שְׁנַ֔יִם בְּכֹ֥ל אֲשֶׁר־יִמָּצֵ֖א ל֑וֹ כִּי־הוּא֙ רֵאשִׁ֣ית אֹנ֔וֹ ל֖וֹ מִשְׁפַּ֥ט הַבְּכֹרָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:17"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 18,
+    "tikkun": "כִּֽי־יִהְיֶ֣ה לְאִ֗ישׁ בֵּ֚ן סוֹרֵ֣ר וּמוֹרֶ֔ה אֵינֶ֣נּוּ שֹׁמֵ֔עַ בְּק֥וֹל אָבִ֖יו וּבְק֣וֹל אִמּ֑וֹ וְיִסְּר֣וּ אֹת֔וֹ וְלֹ֥א יִשְׁמַ֖ע אֲלֵיהֶֽם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:18"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 19,
+    "tikkun": "וְתָ֥פְשׂוּ ב֖וֹ אָבִ֣יו וְאִמּ֑וֹ וְהוֹצִ֧יאוּ אֹת֛וֹ אֶל־זִקְנֵ֥י עִיר֖וֹ וְאֶל־שַׁ֥עַר מְקֹמֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:19"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 20,
+    "tikkun": "וְאָמְר֞וּ אֶל־זִקְנֵ֣י עִיר֗וֹ בְּנֵ֤נוּ זֶה֙ סוֹרֵ֣ר וּמֹרֶ֔ה אֵינֶ֥נּוּ שֹׁמֵ֖עַ בְּקֹלֵ֑נוּ זוֹלֵ֖ל וְסֹבֵֽא׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:20"
+  },
+  {
+    "aliyahId": "ki-tetse-rishon",
+    "chapter": 21,
+    "n": 21,
+    "tikkun": "וּ֠רְגָמֻ֠הוּ כׇּל־אַנְשֵׁ֨י עִיר֤וֹ בָֽאֲבָנִים֙ וָמֵ֔ת וּבִֽעַרְתָּ֥ הָרָ֖ע מִקִּרְבֶּ֑ךָ וְכׇל־יִשְׂרָאֵ֖ל יִשְׁמְע֥וּ וְיִרָֽאוּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:rishon:21:21"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 21,
+    "n": 22,
+    "tikkun": "וְכִֽי־יִהְיֶ֣ה בְאִ֗ישׁ חֵ֛טְא מִשְׁפַּט־מָ֖וֶת וְהוּמָ֑ת וְתָלִ֥יתָ אֹת֖וֹ עַל־עֵֽץ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:21:22"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 21,
+    "n": 23,
+    "tikkun": "לֹא־תָלִ֨ין נִבְלָת֜וֹ עַל־הָעֵ֗ץ כִּֽי־קָב֤וֹר תִּקְבְּרֶ֙נּוּ֙ בַּיּ֣וֹם הַה֔וּא כִּֽי־קִלְלַ֥ת אֱלֹהִ֖ים תָּל֑וּי וְלֹ֤א תְטַמֵּא֙ אֶת־אַדְמָ֣תְךָ֔ אֲשֶׁר֙ יְהֹוָ֣ה אֱלֹהֶ֔יךָ נֹתֵ֥ן לְךָ֖ נַחֲלָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:21:23"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 1,
+    "tikkun": "לֹֽא־תִרְאֶה֩ אֶת־שׁ֨וֹר אָחִ֜יךָ א֤וֹ אֶת־שֵׂיוֹ֙ נִדָּחִ֔ים וְהִתְעַלַּמְתָּ֖ מֵהֶ֑ם הָשֵׁ֥ב תְּשִׁיבֵ֖ם לְאָחִֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:1"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 2,
+    "tikkun": "וְאִם־לֹ֨א קָר֥וֹב אָחִ֛יךָ אֵלֶ֖יךָ וְלֹ֣א יְדַעְתּ֑וֹ וַאֲסַפְתּוֹ֙ אֶל־תּ֣וֹךְ בֵּיתֶ֔ךָ וְהָיָ֣ה עִמְּךָ֗ עַ֣ד דְּרֹ֤שׁ אָחִ֙יךָ֙ אֹת֔וֹ וַהֲשֵׁבֹת֖וֹ לֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:2"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 3,
+    "tikkun": "וְכֵ֧ן תַּעֲשֶׂ֣ה לַחֲמֹר֗וֹ וְכֵ֣ן תַּעֲשֶׂה֮ לְשִׂמְלָתוֹ֒ וְכֵ֣ן תַּעֲשֶׂ֗ה לְכׇל־אֲבֵדַ֥ת אָחִ֛יךָ אֲשֶׁר־תֹּאבַ֥ד מִמֶּ֖נּוּ וּמְצָאתָ֑הּ לֹ֥א תוּכַ֖ל לְהִתְעַלֵּֽם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:3"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 4,
+    "tikkun": "לֹא־תִרְאֶה֩ אֶת־חֲמ֨וֹר אָחִ֜יךָ א֤וֹ שׁוֹרוֹ֙ נֹפְלִ֣ים בַּדֶּ֔רֶךְ וְהִתְעַלַּמְתָּ֖ מֵהֶ֑ם הָקֵ֥ם תָּקִ֖ים עִמּֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:4"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 5,
+    "tikkun": "לֹא־יִהְיֶ֤ה כְלִי־גֶ֙בֶר֙ עַל־אִשָּׁ֔ה וְלֹא־יִלְבַּ֥שׁ גֶּ֖בֶר שִׂמְלַ֣ת אִשָּׁ֑ה כִּ֧י תוֹעֲבַ֛ת יְהֹוָ֥ה אֱלֹהֶ֖יךָ כׇּל־עֹ֥שֵׂה אֵֽלֶּה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:5"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 6,
+    "tikkun": "כִּ֣י יִקָּרֵ֣א *(בספרי תימן קַן בקו״ף גדולה)קַן־צִפּ֣וֹר ׀ לְפָנֶ֡יךָ בַּדֶּ֜רֶךְ בְּכׇל־עֵ֣ץ ׀ א֣וֹ עַל־הָאָ֗רֶץ אֶפְרֹחִים֙ א֣וֹ בֵיצִ֔ים וְהָאֵ֤ם רֹבֶ֙צֶת֙ עַל־הָֽאֶפְרֹחִ֔ים א֖וֹ עַל־הַבֵּיצִ֑ים לֹא־תִקַּ֥ח הָאֵ֖ם עַל־הַבָּנִֽים׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:6"
+  },
+  {
+    "aliyahId": "ki-tetse-sheni",
+    "chapter": 22,
+    "n": 7,
+    "tikkun": "שַׁלֵּ֤חַ תְּשַׁלַּח֙ אֶת־הָאֵ֔ם וְאֶת־הַבָּנִ֖ים תִּֽקַּֽח־לָ֑ךְ לְמַ֙עַן֙ יִ֣יטַב לָ֔ךְ וְהַאֲרַכְתָּ֖ יָמִֽים׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:sheni:22:7"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 8,
+    "tikkun": "כִּ֤י תִבְנֶה֙ בַּ֣יִת חָדָ֔שׁ וְעָשִׂ֥יתָ מַעֲקֶ֖ה לְגַגֶּ֑ךָ וְלֹֽא־תָשִׂ֤ים דָּמִים֙ בְּבֵיתֶ֔ךָ כִּֽי־יִפֹּ֥ל הַנֹּפֵ֖ל מִמֶּֽנּוּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:8"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 9,
+    "tikkun": "לֹא־תִזְרַ֥ע כַּרְמְךָ֖ כִּלְאָ֑יִם פֶּן־תִּקְדַּ֗שׁ הַֽמְלֵאָ֤ה הַזֶּ֙רַע֙ אֲשֶׁ֣ר תִּזְרָ֔ע וּתְבוּאַ֖ת הַכָּֽרֶם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:9"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 10,
+    "tikkun": "לֹֽא־תַחֲרֹ֥שׁ בְּשׁוֹר־וּבַחֲמֹ֖ר יַחְדָּֽו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:10"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 11,
+    "tikkun": "לֹ֤א תִלְבַּשׁ֙ שַֽׁעַטְנֵ֔ז צֶ֥מֶר וּפִשְׁתִּ֖ים יַחְדָּֽו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:11"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 12,
+    "tikkun": "גְּדִלִ֖ים תַּעֲשֶׂה־לָּ֑ךְ עַל־אַרְבַּ֛ע כַּנְפ֥וֹת כְּסוּתְךָ֖ אֲשֶׁ֥ר תְּכַסֶּה־בָּֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:12"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 13,
+    "tikkun": "כִּֽי־יִקַּ֥ח אִ֖ישׁ אִשָּׁ֑ה וּבָ֥א אֵלֶ֖יהָ וּשְׂנֵאָֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:13"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 14,
+    "tikkun": "וְשָׂ֥ם לָהּ֙ עֲלִילֹ֣ת דְּבָרִ֔ים וְהוֹצִ֥א עָלֶ֖יהָ שֵׁ֣ם רָ֑ע וְאָמַ֗ר אֶת־הָאִשָּׁ֤ה הַזֹּאת֙ לָקַ֔חְתִּי וָאֶקְרַ֣ב אֵלֶ֔יהָ וְלֹא־מָצָ֥אתִי לָ֖הּ בְּתוּלִֽים׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:14"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 15,
+    "tikkun": "וְלָקַ֛ח אֲבִ֥י הַֽנַּעֲרָ֖ וְאִמָּ֑הּ וְהוֹצִ֜יאוּ אֶת־בְּתוּלֵ֧י הַֽנַּעֲרָ֛ אֶל־זִקְנֵ֥י הָעִ֖יר הַשָּֽׁעְרָה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:15"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 16,
+    "tikkun": "וְאָמַ֛ר אֲבִ֥י הַֽנַּעֲרָ֖ אֶל־הַזְּקֵנִ֑ים אֶת־בִּתִּ֗י נָתַ֜תִּי לָאִ֥ישׁ הַזֶּ֛ה לְאִשָּׁ֖ה וַיִּשְׂנָאֶֽהָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:16"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 17,
+    "tikkun": "וְהִנֵּה־ה֡וּא שָׂם֩ עֲלִילֹ֨ת דְּבָרִ֜ים לֵאמֹ֗ר לֹֽא־מָצָ֤אתִי לְבִתְּךָ֙ בְּתוּלִ֔ים וְאֵ֖לֶּה בְּתוּלֵ֣י בִתִּ֑י וּפָֽרְשׂוּ֙ הַשִּׂמְלָ֔ה לִפְנֵ֖י זִקְנֵ֥י הָעִֽיר׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:17"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 18,
+    "tikkun": "וְלָ֥קְח֛וּ זִקְנֵ֥י הָֽעִיר־הַהִ֖וא אֶת־הָאִ֑ישׁ וְיִסְּר֖וּ אֹתֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:18"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 19,
+    "tikkun": "וְעָנְשׁ֨וּ אֹת֜וֹ מֵ֣אָה כֶ֗סֶף וְנָתְנוּ֙ לַאֲבִ֣י הַֽנַּעֲרָ֔ה כִּ֤י הוֹצִיא֙ שֵׁ֣ם רָ֔ע עַ֖ל בְּתוּלַ֣ת יִשְׂרָאֵ֑ל וְלֽוֹ־תִהְיֶ֣ה לְאִשָּׁ֔ה לֹא־יוּכַ֥ל לְשַׁלְּחָ֖הּ כׇּל־יָמָֽיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:19"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 20,
+    "tikkun": "וְאִם־אֱמֶ֣ת הָיָ֔ה הַדָּבָ֖ר הַזֶּ֑ה לֹא־נִמְצְא֥וּ בְתוּלִ֖ים לַֽנַּעֲרָֽ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:20"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 21,
+    "tikkun": "וְהוֹצִ֨יאוּ אֶת־הַֽנַּעֲרָ֜ אֶל־פֶּ֣תַח בֵּית־אָבִ֗יהָ וּסְקָל֩וּהָ֩ אַנְשֵׁ֨י עִירָ֤הּ בָּאֲבָנִים֙ וָמֵ֔תָה כִּֽי־עָשְׂתָ֤ה נְבָלָה֙ בְּיִשְׂרָאֵ֔ל לִזְנ֖וֹת בֵּ֣ית אָבִ֑יהָ וּבִֽעַרְתָּ֥ הָרָ֖ע מִקִּרְבֶּֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:21"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 22,
+    "tikkun": "כִּֽי־יִמָּצֵ֨א אִ֜ישׁ שֹׁכֵ֣ב ׀ עִם־אִשָּׁ֣ה בְעֻֽלַת־בַּ֗עַל וּמֵ֙תוּ֙ גַּם־שְׁנֵיהֶ֔ם הָאִ֛ישׁ הַשֹּׁכֵ֥ב עִם־הָאִשָּׁ֖ה וְהָאִשָּׁ֑ה וּבִֽעַרְתָּ֥ הָרָ֖ע מִיִּשְׂרָאֵֽל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:22"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 23,
+    "tikkun": "כִּ֤י יִהְיֶה֙ נַעֲרָ֣ בְתוּלָ֔ה מְאֹרָשָׂ֖ה לְאִ֑ישׁ וּמְצָאָ֥הּ אִ֛ישׁ בָּעִ֖יר וְשָׁכַ֥ב עִמָּֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:23"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 24,
+    "tikkun": "וְהוֹצֵאתֶ֨ם אֶת־שְׁנֵיהֶ֜ם אֶל־שַׁ֣עַר ׀ הָעִ֣יר הַהִ֗וא וּסְקַלְתֶּ֨ם אֹתָ֥ם בָּאֲבָנִים֮ וָמֵ֒תוּ֒ אֶת־הַֽנַּעֲרָ֗ עַל־דְּבַר֙ אֲשֶׁ֣ר לֹא־צָעֲקָ֣ה בָעִ֔יר וְאֶ֨ת־הָאִ֔ישׁ עַל־דְּבַ֥ר אֲשֶׁר־עִנָּ֖ה אֶת־אֵ֣שֶׁת רֵעֵ֑הוּ וּבִֽעַרְתָּ֥ הָרָ֖ע מִקִּרְבֶּֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:24"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 25,
+    "tikkun": "וְֽאִם־בַּשָּׂדֶ֞ה יִמְצָ֣א הָאִ֗ישׁ אֶת־הַֽנַּעֲרָ֙ הַמְאֹ֣רָשָׂ֔ה וְהֶחֱזִֽיק־בָּ֥הּ הָאִ֖ישׁ וְשָׁכַ֣ב עִמָּ֑הּ וּמֵ֗ת הָאִ֛ישׁ אֲשֶׁר־שָׁכַ֥ב עִמָּ֖הּ לְבַדּֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:25"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 26,
+    "tikkun": "וְלַֽנַּעֲרָ֙ לֹא־תַעֲשֶׂ֣ה דָבָ֔ר אֵ֥ין לַֽנַּעֲרָ֖ חֵ֣טְא מָ֑וֶת כִּ֡י כַּאֲשֶׁר֩ יָק֨וּם אִ֤ישׁ עַל־רֵעֵ֙הוּ֙ וּרְצָח֣וֹ נֶ֔פֶשׁ כֵּ֖ן הַדָּבָ֥ר הַזֶּֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:26"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 27,
+    "tikkun": "כִּ֥י בַשָּׂדֶ֖ה מְצָאָ֑הּ צָעֲקָ֗ה הַֽנַּעֲרָ֙ הַמְאֹ֣רָשָׂ֔ה וְאֵ֥ין מוֹשִׁ֖יעַ לָֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:27"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 28,
+    "tikkun": "כִּֽי־יִמְצָ֣א אִ֗ישׁ נַעֲרָ֤ בְתוּלָה֙ אֲשֶׁ֣ר לֹא־אֹרָ֔שָׂה וּתְפָשָׂ֖הּ וְשָׁכַ֣ב עִמָּ֑הּ וְנִמְצָֽאוּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:28"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 22,
+    "n": 29,
+    "tikkun": "וְ֠נָתַ֠ן הָאִ֨ישׁ הַשֹּׁכֵ֥ב עִמָּ֛הּ לַאֲבִ֥י הַֽנַּעֲרָ֖ חֲמִשִּׁ֣ים כָּ֑סֶף וְלֽוֹ־תִהְיֶ֣ה לְאִשָּׁ֗ה תַּ֚חַת אֲשֶׁ֣ר עִנָּ֔הּ לֹא־יוּכַ֥ל שַׁלְּחָ֖הּ כׇּל־יָמָֽיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:22:29"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 1,
+    "tikkun": "לֹא־יִקַּ֥ח אִ֖ישׁ אֶת־אֵ֣שֶׁת אָבִ֑יו וְלֹ֥א יְגַלֶּ֖ה כְּנַ֥ף אָבִֽיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:1"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 2,
+    "tikkun": "לֹֽא־יָבֹ֧א פְצֽוּעַ־דַּכָּ֛א*(בספרי ספרד ורוב ספרי אשכנז דַּכָּ֛ה) וּכְר֥וּת שׇׁפְכָ֖ה בִּקְהַ֥ל יְהֹוָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:2"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 3,
+    "tikkun": "לֹא־יָבֹ֥א מַמְזֵ֖ר בִּקְהַ֣ל יְהֹוָ֑ה גַּ֚ם דּ֣וֹר עֲשִׂירִ֔י לֹא־יָ֥בֹא ל֖וֹ בִּקְהַ֥ל יְהֹוָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:3"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 4,
+    "tikkun": "לֹֽא־יָבֹ֧א עַמּוֹנִ֛י וּמוֹאָבִ֖י בִּקְהַ֣ל יְהֹוָ֑ה גַּ֚ם דּ֣וֹר עֲשִׂירִ֔י לֹא־יָבֹ֥א לָהֶ֛ם בִּקְהַ֥ל יְהֹוָ֖ה עַד־עוֹלָֽם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:4"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 5,
+    "tikkun": "עַל־דְּבַ֞ר אֲשֶׁ֨ר לֹא־קִדְּמ֤וּ אֶתְכֶם֙ בַּלֶּ֣חֶם וּבַמַּ֔יִם בַּדֶּ֖רֶךְ בְּצֵאתְכֶ֣ם מִמִּצְרָ֑יִם וַאֲשֶׁר֩ שָׂכַ֨ר עָלֶ֜יךָ אֶת־בִּלְעָ֣ם בֶּן־בְּע֗וֹר מִפְּת֛וֹר אֲרַ֥ם נַהֲרַ֖יִם לְקַֽלְלֶֽךָּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:5"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 6,
+    "tikkun": "וְלֹֽא־אָבָ֞ה יְהֹוָ֤ה אֱלֹהֶ֙יךָ֙ לִשְׁמֹ֣עַ אֶל־בִּלְעָ֔ם וַיַּהֲפֹךְ֩ יְהֹוָ֨ה אֱלֹהֶ֧יךָ לְּךָ֛ אֶת־הַקְּלָלָ֖ה לִבְרָכָ֑ה כִּ֥י אֲהֵֽבְךָ֖ יְהֹוָ֥ה אֱלֹהֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:6"
+  },
+  {
+    "aliyahId": "ki-tetse-shelishi",
+    "chapter": 23,
+    "n": 7,
+    "tikkun": "לֹא־תִדְרֹ֥שׁ שְׁלֹמָ֖ם וְטֹבָתָ֑ם כׇּל־יָמֶ֖יךָ לְעוֹלָֽם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shelishi:23:7"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 8,
+    "tikkun": "לֹֽא־תְתַעֵ֣ב אֲדֹמִ֔י כִּ֥י אָחִ֖יךָ ה֑וּא לֹא־תְתַעֵ֣ב מִצְרִ֔י כִּי־גֵ֖ר הָיִ֥יתָ בְאַרְצֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:8"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 9,
+    "tikkun": "בָּנִ֛ים אֲשֶׁר־יִוָּלְד֥וּ לָהֶ֖ם דּ֣וֹר שְׁלִישִׁ֑י יָבֹ֥א לָהֶ֖ם בִּקְהַ֥ל יְהֹוָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:9"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 10,
+    "tikkun": "כִּֽי־תֵצֵ֥א מַחֲנֶ֖ה עַל־אֹיְבֶ֑יךָ וְנִ֨שְׁמַרְתָּ֔ מִכֹּ֖ל דָּבָ֥ר רָֽע׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:10"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 11,
+    "tikkun": "כִּֽי־יִהְיֶ֤ה בְךָ֙ אִ֔ישׁ אֲשֶׁ֛ר לֹא־יִהְיֶ֥ה טָה֖וֹר מִקְּרֵה־לָ֑יְלָה וְיָצָא֙ אֶל־מִח֣וּץ לַֽמַּחֲנֶ֔ה לֹ֥א יָבֹ֖א אֶל־תּ֥וֹךְ הַֽמַּחֲנֶֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:11"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 12,
+    "tikkun": "וְהָיָ֥ה לִפְנֽוֹת־עֶ֖רֶב יִרְחַ֣ץ בַּמָּ֑יִם וּכְבֹ֣א הַשֶּׁ֔מֶשׁ יָבֹ֖א אֶל־תּ֥וֹךְ הַֽמַּחֲנֶֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:12"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 13,
+    "tikkun": "וְיָד֙ תִּהְיֶ֣ה לְךָ֔ מִח֖וּץ לַֽמַּחֲנֶ֑ה וְיָצָ֥אתָ שָּׁ֖מָּה חֽוּץ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:13"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 14,
+    "tikkun": "וְיָתֵ֛ד תִּהְיֶ֥ה לְךָ֖ עַל־אֲזֵנֶ֑ךָ וְהָיָה֙ בְּשִׁבְתְּךָ֣ ח֔וּץ וְחָפַרְתָּ֣ה בָ֔הּ וְשַׁבְתָּ֖ וְכִסִּ֥יתָ אֶת־צֵאָתֶֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:14"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 15,
+    "tikkun": "כִּי֩ יְהֹוָ֨ה אֱלֹהֶ֜יךָ מִתְהַלֵּ֣ךְ ׀ בְּקֶ֣רֶב מַחֲנֶ֗ךָ לְהַצִּֽילְךָ֙ וְלָתֵ֤ת אֹיְבֶ֙יךָ֙ לְפָנֶ֔יךָ וְהָיָ֥ה מַחֲנֶ֖יךָ קָד֑וֹשׁ וְלֹֽא־יִרְאֶ֤ה בְךָ֙ עֶרְוַ֣ת דָּבָ֔ר וְשָׁ֖ב מֵאַחֲרֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:15"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 16,
+    "tikkun": "לֹא־תַסְגִּ֥יר עֶ֖בֶד אֶל־אֲדֹנָ֑יו אֲשֶׁר־יִנָּצֵ֥ל אֵלֶ֖יךָ מֵעִ֥ם אֲדֹנָֽיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:16"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 17,
+    "tikkun": "עִמְּךָ֞ יֵשֵׁ֣ב בְּקִרְבְּךָ֗ בַּמָּק֧וֹם אֲשֶׁר־יִבְחַ֛ר בְּאַחַ֥ד שְׁעָרֶ֖יךָ בַּטּ֣וֹב ל֑וֹ לֹ֖א תּוֹנֶֽנּוּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:17"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 18,
+    "tikkun": "לֹא־תִהְיֶ֥ה קְדֵשָׁ֖ה מִבְּנ֣וֹת יִשְׂרָאֵ֑ל וְלֹֽא־יִהְיֶ֥ה קָדֵ֖שׁ מִבְּנֵ֥י יִשְׂרָאֵֽל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:18"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 19,
+    "tikkun": "לֹא־תָבִיא֩ אֶתְנַ֨ן זוֹנָ֜ה וּמְחִ֣יר כֶּ֗לֶב בֵּ֛ית יְהֹוָ֥ה אֱלֹהֶ֖יךָ לְכׇל־נֶ֑דֶר כִּ֧י תוֹעֲבַ֛ת יְהֹוָ֥ה אֱלֹהֶ֖יךָ גַּם־שְׁנֵיהֶֽם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:19"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 20,
+    "tikkun": "לֹא־תַשִּׁ֣יךְ לְאָחִ֔יךָ נֶ֥שֶׁךְ כֶּ֖סֶף נֶ֣שֶׁךְ אֹ֑כֶל נֶ֕שֶׁךְ כׇּל־דָּבָ֖ר אֲשֶׁ֥ר יִשָּֽׁךְ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:20"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 21,
+    "tikkun": "לַנׇּכְרִ֣י תַשִּׁ֔יךְ וּלְאָחִ֖יךָ לֹ֣א תַשִּׁ֑יךְ לְמַ֨עַן יְבָרֶכְךָ֜ יְהֹוָ֣ה אֱלֹהֶ֗יךָ בְּכֹל֙ מִשְׁלַ֣ח יָדֶ֔ךָ עַל־הָאָ֕רֶץ אֲשֶׁר־אַתָּ֥ה בָא־שָׁ֖מָּה לְרִשְׁתָּֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:21"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 22,
+    "tikkun": "כִּֽי־תִדֹּ֥ר נֶ֙דֶר֙ לַיהֹוָ֣ה אֱלֹהֶ֔יךָ לֹ֥א תְאַחֵ֖ר לְשַׁלְּמ֑וֹ כִּֽי־דָרֹ֨שׁ יִדְרְשֶׁ֜נּוּ יְהֹוָ֤ה אֱלֹהֶ֙יךָ֙ מֵֽעִמָּ֔ךְ וְהָיָ֥ה בְךָ֖ חֵֽטְא׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:22"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 23,
+    "tikkun": "וְכִ֥י תֶחְדַּ֖ל לִנְדֹּ֑ר לֹֽא־יִהְיֶ֥ה בְךָ֖ חֵֽטְא׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:23"
+  },
+  {
+    "aliyahId": "ki-tetse-revii",
+    "chapter": 23,
+    "n": 24,
+    "tikkun": "מוֹצָ֥א שְׂפָתֶ֖יךָ תִּשְׁמֹ֣ר וְעָשִׂ֑יתָ כַּאֲשֶׁ֨ר נָדַ֜רְתָּ לַיהֹוָ֤ה אֱלֹהֶ֙יךָ֙ נְדָבָ֔ה אֲשֶׁ֥ר דִּבַּ֖רְתָּ בְּפִֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:revii:23:24"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 23,
+    "n": 25,
+    "tikkun": "כִּ֤י תָבֹא֙ בְּכֶ֣רֶם רֵעֶ֔ךָ וְאָכַלְתָּ֧ עֲנָבִ֛ים כְּנַפְשְׁךָ֖ שׇׂבְעֶ֑ךָ וְאֶֽל־כֶּלְיְךָ֖ לֹ֥א תִתֵּֽן׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:23:25"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 23,
+    "n": 26,
+    "tikkun": "כִּ֤י תָבֹא֙ בְּקָמַ֣ת רֵעֶ֔ךָ וְקָטַפְתָּ֥ מְלִילֹ֖ת בְּיָדֶ֑ךָ וְחֶרְמֵשׁ֙ לֹ֣א תָנִ֔יף עַ֖ל קָמַ֥ת רֵעֶֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:23:26"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 24,
+    "n": 1,
+    "tikkun": "כִּֽי־יִקַּ֥ח אִ֛ישׁ אִשָּׁ֖ה וּבְעָלָ֑הּ וְהָיָ֞ה אִם־לֹ֧א תִמְצָא־חֵ֣ן בְּעֵינָ֗יו כִּי־מָ֤צָא בָהּ֙ עֶרְוַ֣ת דָּבָ֔ר וְכָ֨תַב לָ֜הּ סֵ֤פֶר כְּרִיתֻת֙ וְנָתַ֣ן בְּיָדָ֔הּ וְשִׁלְּחָ֖הּ מִבֵּיתֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:24:1"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 24,
+    "n": 2,
+    "tikkun": "וְיָצְאָ֖ה מִבֵּית֑וֹ וְהָלְכָ֖ה וְהָיְתָ֥ה לְאִישׁ־אַחֵֽר׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:24:2"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 24,
+    "n": 3,
+    "tikkun": "וּשְׂנֵאָהּ֮ הָאִ֣ישׁ הָאַחֲרוֹן֒ וְכָ֨תַב לָ֜הּ סֵ֤פֶר כְּרִיתֻת֙ וְנָתַ֣ן בְּיָדָ֔הּ וְשִׁלְּחָ֖הּ מִבֵּית֑וֹ א֣וֹ כִ֤י יָמוּת֙ הָאִ֣ישׁ הָאַחֲר֔וֹן אֲשֶׁר־לְקָחָ֥הּ ל֖וֹ לְאִשָּֽׁה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:24:3"
+  },
+  {
+    "aliyahId": "ki-tetse-chamishi",
+    "chapter": 24,
+    "n": 4,
+    "tikkun": "לֹא־יוּכַ֣ל בַּעְלָ֣הּ הָרִאשׁ֣וֹן אֲשֶֽׁר־שִׁ֠לְּחָ֠הּ לָשׁ֨וּב לְקַחְתָּ֜הּ לִהְי֧וֹת ל֣וֹ לְאִשָּׁ֗ה אַחֲרֵי֙ אֲשֶׁ֣ר הֻטַּמָּ֔אָה כִּֽי־תוֹעֵבָ֥ה הִ֖וא לִפְנֵ֣י יְהֹוָ֑ה וְלֹ֤א תַחֲטִיא֙ אֶת־הָאָ֔רֶץ אֲשֶׁר֙ יְהֹוָ֣ה אֱלֹהֶ֔יךָ נֹתֵ֥ן לְךָ֖ נַחֲלָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:chamishi:24:4"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 5,
+    "tikkun": "כִּֽי־יִקַּ֥ח אִישׁ֙ אִשָּׁ֣ה חֲדָשָׁ֔ה לֹ֤א יֵצֵא֙ בַּצָּבָ֔א וְלֹא־יַעֲבֹ֥ר עָלָ֖יו לְכׇל־דָּבָ֑ר נָקִ֞י יִהְיֶ֤ה לְבֵיתוֹ֙ שָׁנָ֣ה אֶחָ֔ת וְשִׂמַּ֖ח אֶת־אִשְׁתּ֥וֹ אֲשֶׁר־לָקָֽח׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:5"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 6,
+    "tikkun": "לֹא־יַחֲבֹ֥ל רֵחַ֖יִם וָרָ֑כֶב כִּי־נֶ֖פֶשׁ ה֥וּא חֹבֵֽל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:6"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 7,
+    "tikkun": "כִּי־יִמָּצֵ֣א אִ֗ישׁ גֹּנֵ֨ב נֶ֤פֶשׁ מֵאֶחָיו֙ מִבְּנֵ֣י יִשְׂרָאֵ֔ל וְהִתְעַמֶּר־בּ֖וֹ וּמְכָר֑וֹ וּמֵת֙ הַגַּנָּ֣ב הַה֔וּא וּבִֽעַרְתָּ֥ הָרָ֖ע מִקִּרְבֶּֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:7"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 8,
+    "tikkun": "הִשָּׁ֧מֶר בְּנֶֽגַע־הַצָּרַ֛עַת לִשְׁמֹ֥ר מְאֹ֖ד וְלַעֲשׂ֑וֹת כְּכֹל֩ אֲשֶׁר־יוֹר֨וּ אֶתְכֶ֜ם הַכֹּהֲנִ֧ים הַלְוִיִּ֛ם כַּאֲשֶׁ֥ר צִוִּיתִ֖ם תִּשְׁמְר֥וּ לַעֲשֽׂוֹת׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:8"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 9,
+    "tikkun": "זָכ֕וֹר אֵ֧ת אֲשֶׁר־עָשָׂ֛ה יְהֹוָ֥ה אֱלֹהֶ֖יךָ לְמִרְיָ֑ם בַּדֶּ֖רֶךְ בְּצֵאתְכֶ֥ם מִמִּצְרָֽיִם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:9"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 10,
+    "tikkun": "כִּֽי־תַשֶּׁ֥ה בְרֵֽעֲךָ֖ מַשַּׁ֣את מְא֑וּמָה לֹא־תָבֹ֥א אֶל־בֵּית֖וֹ לַעֲבֹ֥ט עֲבֹטֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:10"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 11,
+    "tikkun": "בַּח֖וּץ תַּעֲמֹ֑ד וְהָאִ֗ישׁ אֲשֶׁ֤ר אַתָּה֙ נֹשֶׁ֣ה ב֔וֹ יוֹצִ֥יא אֵלֶ֛יךָ אֶֽת־הַעֲב֖וֹט הַחֽוּצָה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:11"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 12,
+    "tikkun": "וְאִם־אִ֥ישׁ עָנִ֖י ה֑וּא לֹ֥א תִשְׁכַּ֖ב בַּעֲבֹטֽוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:12"
+  },
+  {
+    "aliyahId": "ki-tetse-shishi",
+    "chapter": 24,
+    "n": 13,
+    "tikkun": "הָשֵׁב֩ תָּשִׁ֨יב ל֤וֹ אֶֽת־הַעֲבוֹט֙ כְּב֣וֹא הַשֶּׁ֔מֶשׁ וְשָׁכַ֥ב בְּשַׂלְמָת֖וֹ וּבֵֽרְכֶ֑ךָּ וּלְךָ֙ תִּהְיֶ֣ה צְדָקָ֔ה לִפְנֵ֖י יְהֹוָ֥ה אֱלֹהֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shishi:24:13"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 14,
+    "tikkun": "לֹא־תַעֲשֹׁ֥ק שָׂכִ֖יר עָנִ֣י וְאֶבְי֑וֹן מֵאַחֶ֕יךָ א֧וֹ מִגֵּרְךָ֛ אֲשֶׁ֥ר בְּאַרְצְךָ֖ בִּשְׁעָרֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:14"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 15,
+    "tikkun": "בְּיוֹמוֹ֩ תִתֵּ֨ן שְׂכָר֜וֹ וְֽלֹא־תָב֧וֹא עָלָ֣יו הַשֶּׁ֗מֶשׁ כִּ֤י עָנִי֙ ה֔וּא וְאֵלָ֕יו ה֥וּא נֹשֵׂ֖א אֶת־נַפְשׁ֑וֹ וְלֹֽא־יִקְרָ֤א עָלֶ֙יךָ֙ אֶל־יְהֹוָ֔ה וְהָיָ֥ה בְךָ֖ חֵֽטְא׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:15"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 16,
+    "tikkun": "לֹֽא־יוּמְת֤וּ אָבוֹת֙ עַל־בָּנִ֔ים וּבָנִ֖ים לֹא־יוּמְת֣וּ עַל־אָב֑וֹת אִ֥ישׁ בְּחֶטְא֖וֹ יוּמָֽתוּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:16"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 17,
+    "tikkun": "לֹ֣א תַטֶּ֔ה מִשְׁפַּ֖ט גֵּ֣ר יָת֑וֹם וְלֹ֣א תַחֲבֹ֔ל בֶּ֖גֶד אַלְמָנָֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:17"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 18,
+    "tikkun": "וְזָכַרְתָּ֗ כִּ֣י עֶ֤בֶד הָיִ֙יתָ֙ בְּמִצְרַ֔יִם וַֽיִּפְדְּךָ֛ יְהֹוָ֥ה אֱלֹהֶ֖יךָ מִשָּׁ֑ם עַל־כֵּ֞ן אָנֹכִ֤י מְצַוְּךָ֙ לַעֲשׂ֔וֹת אֶת־הַדָּבָ֖ר הַזֶּֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:18"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 19,
+    "tikkun": "כִּ֣י תִקְצֹר֩ קְצִֽירְךָ֨ בְשָׂדֶ֜ךָ וְשָֽׁכַחְתָּ֧ עֹ֣מֶר בַּשָּׂדֶ֗ה לֹ֤א תָשׁוּב֙ לְקַחְתּ֔וֹ לַגֵּ֛ר לַיָּת֥וֹם וְלָאַלְמָנָ֖ה יִהְיֶ֑ה לְמַ֤עַן יְבָרֶכְךָ֙ יְהֹוָ֣ה אֱלֹהֶ֔יךָ בְּכֹ֖ל מַעֲשֵׂ֥ה יָדֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:19"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 20,
+    "tikkun": "כִּ֤י תַחְבֹּט֙ זֵֽיתְךָ֔ לֹ֥א תְפַאֵ֖ר אַחֲרֶ֑יךָ לַגֵּ֛ר לַיָּת֥וֹם וְלָאַלְמָנָ֖ה יִהְיֶֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:20"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 21,
+    "tikkun": "כִּ֤י תִבְצֹר֙ כַּרְמְךָ֔ לֹ֥א תְעוֹלֵ֖ל אַחֲרֶ֑יךָ לַגֵּ֛ר לַיָּת֥וֹם וְלָאַלְמָנָ֖ה יִהְיֶֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:21"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 24,
+    "n": 22,
+    "tikkun": "וְזָ֣כַרְתָּ֔ כִּי־עֶ֥בֶד הָיִ֖יתָ בְּאֶ֣רֶץ מִצְרָ֑יִם עַל־כֵּ֞ן אָנֹכִ֤י מְצַוְּךָ֙ לַעֲשׂ֔וֹת אֶת־הַדָּבָ֖ר הַזֶּֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:24:22"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 1,
+    "tikkun": "כִּֽי־יִהְיֶ֥ה רִיב֙ בֵּ֣ין אֲנָשִׁ֔ים וְנִגְּשׁ֥וּ אֶל־הַמִּשְׁפָּ֖ט וּשְׁפָט֑וּם וְהִצְדִּ֙יקוּ֙ אֶת־הַצַּדִּ֔יק וְהִרְשִׁ֖יעוּ אֶת־הָרָשָֽׁע׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:1"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 2,
+    "tikkun": "וְהָיָ֛ה אִם־בִּ֥ן הַכּ֖וֹת הָרָשָׁ֑ע וְהִפִּיל֤וֹ הַשֹּׁפֵט֙ וְהִכָּ֣הוּ לְפָנָ֔יו כְּדֵ֥י רִשְׁעָת֖וֹ בְּמִסְפָּֽר׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:2"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 3,
+    "tikkun": "אַרְבָּעִ֥ים יַכֶּ֖נּוּ לֹ֣א יֹסִ֑יף פֶּן־יֹסִ֨יף לְהַכֹּת֤וֹ עַל־אֵ֙לֶּה֙ מַכָּ֣ה רַבָּ֔ה וְנִקְלָ֥ה אָחִ֖יךָ לְעֵינֶֽיךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:3"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 4,
+    "tikkun": "לֹא־תַחְסֹ֥ם שׁ֖וֹר בְּדִישֽׁוֹ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:4"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 5,
+    "tikkun": "כִּֽי־יֵשְׁב֨וּ אַחִ֜ים יַחְדָּ֗ו וּמֵ֨ת אַחַ֤ד מֵהֶם֙ וּבֵ֣ן אֵֽין־ל֔וֹ לֹֽא־תִהְיֶ֧ה אֵֽשֶׁת־הַמֵּ֛ת הַח֖וּצָה לְאִ֣ישׁ זָ֑ר יְבָמָהּ֙ יָבֹ֣א עָלֶ֔יהָ וּלְקָחָ֥הּ ל֛וֹ לְאִשָּׁ֖ה וְיִבְּמָֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:5"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 6,
+    "tikkun": "וְהָיָ֗ה הַבְּכוֹר֙ אֲשֶׁ֣ר תֵּלֵ֔ד יָק֕וּם עַל־שֵׁ֥ם אָחִ֖יו הַמֵּ֑ת וְלֹֽא־יִמָּחֶ֥ה שְׁמ֖וֹ מִיִּשְׂרָאֵֽל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:6"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 7,
+    "tikkun": "וְאִם־לֹ֤א יַחְפֹּץ֙ הָאִ֔ישׁ לָקַ֖חַת אֶת־יְבִמְתּ֑וֹ וְעָלְתָה֩ יְבִמְתּ֨וֹ הַשַּׁ֜עְרָה אֶל־הַזְּקֵנִ֗ים וְאָֽמְרָה֙ מֵאֵ֨ן יְבָמִ֜י לְהָקִ֨ים לְאָחִ֥יו שֵׁם֙ בְּיִשְׂרָאֵ֔ל לֹ֥א אָבָ֖ה יַבְּמִֽי׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:7"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 8,
+    "tikkun": "וְקָֽרְאוּ־ל֥וֹ זִקְנֵי־עִיר֖וֹ וְדִבְּר֣וּ אֵלָ֑יו וְעָמַ֣ד וְאָמַ֔ר לֹ֥א חָפַ֖צְתִּי לְקַחְתָּֽהּ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:8"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 9,
+    "tikkun": "וְנִגְּשָׁ֨ה יְבִמְתּ֣וֹ אֵלָיו֮ לְעֵינֵ֣י הַזְּקֵנִים֒ וְחָלְצָ֤ה נַעֲלוֹ֙ מֵעַ֣ל רַגְל֔וֹ וְיָרְקָ֖ה בְּפָנָ֑יו וְעָֽנְתָה֙ וְאָ֣מְרָ֔ה כָּ֚כָה יֵעָשֶׂ֣ה לָאִ֔ישׁ אֲשֶׁ֥ר לֹא־יִבְנֶ֖ה אֶת־בֵּ֥ית אָחִֽיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:9"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 10,
+    "tikkun": "וְנִקְרָ֥א שְׁמ֖וֹ בְּיִשְׂרָאֵ֑ל בֵּ֖ית חֲל֥וּץ הַנָּֽעַל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:10"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 11,
+    "tikkun": "כִּֽי־יִנָּצ֨וּ אֲנָשִׁ֤ים יַחְדָּו֙ אִ֣ישׁ וְאָחִ֔יו וְקָֽרְבָה֙ אֵ֣שֶׁת הָֽאֶחָ֔ד לְהַצִּ֥יל אֶת־אִישָׁ֖הּ מִיַּ֣ד מַכֵּ֑הוּ וְשָׁלְחָ֣ה יָדָ֔הּ וְהֶחֱזִ֖יקָה בִּמְבֻשָֽׁיו׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:11"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 12,
+    "tikkun": "וְקַצֹּתָ֖ה אֶת־כַּפָּ֑הּ לֹ֥א תָח֖וֹס עֵינֶֽךָ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:12"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 13,
+    "tikkun": "לֹֽא־יִהְיֶ֥ה לְךָ֛ בְּכִֽיסְךָ֖ אֶ֣בֶן וָאָ֑בֶן גְּדוֹלָ֖ה וּקְטַנָּֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:13"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 14,
+    "tikkun": "לֹא־יִהְיֶ֥ה לְךָ֛ בְּבֵיתְךָ֖ אֵיפָ֣ה וְאֵיפָ֑ה גְּדוֹלָ֖ה וּקְטַנָּֽה׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:14"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 15,
+    "tikkun": "אֶ֣בֶן שְׁלֵמָ֤ה וָצֶ֙דֶק֙ יִֽהְיֶה־לָּ֔ךְ אֵיפָ֧ה שְׁלֵמָ֛ה וָצֶ֖דֶק יִֽהְיֶה־לָּ֑ךְ לְמַ֙עַן֙ יַאֲרִ֣יכוּ יָמֶ֔יךָ עַ֚ל הָֽאֲדָמָ֔ה אֲשֶׁר־יְהֹוָ֥ה אֱלֹהֶ֖יךָ נֹתֵ֥ן לָֽךְ׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:15"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 16,
+    "tikkun": "כִּ֧י תוֹעֲבַ֛ת יְהֹוָ֥ה אֱלֹהֶ֖יךָ כׇּל־עֹ֣שֵׂה אֵ֑לֶּה כֹּ֖ל עֹ֥שֵׂה עָֽוֶל׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:16"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 17,
+    "tikkun": "זָכ֕וֹר אֵ֛ת אֲשֶׁר־עָשָׂ֥ה לְךָ֖ עֲמָלֵ֑ק בַּדֶּ֖רֶךְ בְּצֵאתְכֶ֥ם מִמִּצְרָֽיִם׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:17"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 18,
+    "tikkun": "אֲשֶׁ֨ר קָֽרְךָ֜ בַּדֶּ֗רֶךְ וַיְזַנֵּ֤ב בְּךָ֙ כׇּל־הַנֶּחֱשָׁלִ֣ים אַֽחֲרֶ֔יךָ וְאַתָּ֖ה עָיֵ֣ף וְיָגֵ֑עַ וְלֹ֥א יָרֵ֖א אֱלֹהִֽים׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:18"
+  },
+  {
+    "aliyahId": "ki-tetse-shevii",
+    "chapter": 25,
+    "n": 19,
+    "tikkun": "וְהָיָ֡ה בְּהָנִ֣יחַ יְהֹוָ֣ה אֱלֹהֶ֣יךָ ׀ לְ֠ךָ֠ מִכׇּל־אֹ֨יְבֶ֜יךָ מִסָּבִ֗יב בָּאָ֙רֶץ֙ אֲשֶׁ֣ר יְהֹוָה־אֱ֠לֹהֶ֠יךָ נֹתֵ֨ן לְךָ֤ נַחֲלָה֙ לְרִשְׁתָּ֔הּ תִּמְחֶה֙ אֶת־זֵ֣כֶר עֲמָלֵ֔ק מִתַּ֖חַת הַשָּׁמָ֑יִם לֹ֖א תִּשְׁכָּֽח׃",
+    "audio": null,
+    "wordStarts": [],
+    "key": "devarim:ki-tetse:shevii:25:19"
+  }
+];
+
 export const verses = [...rishon, ...sheni, ...shelishi].map((verse) => ({
   ...verse,
   key: `bereshit:vayetzei:${verse.aliyahId.replace('vayetzei-','')}:${verse.chapter}:${verse.n}`
 }));
+
+verses.push(...kiTetse);
 
 export const DEFAULT_SELECTION = { seferId:'bereshit', parashaId:'vayetzei', aliyahId:'vayetzei-rishon' };
 export const SELECTION_STORAGE_KEY = 'torah-practice-selection-v1';
