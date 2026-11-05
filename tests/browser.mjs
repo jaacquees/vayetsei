@@ -35,6 +35,10 @@ await new Promise(r => server.listen(0,'127.0.0.1',r));
 const origin = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({headless:true, ...(process.env.CHROMIUM_EXECUTABLE ? {executablePath:process.env.CHROMIUM_EXECUTABLE, args:['--no-sandbox','--disable-dev-shm-usage']} : {})});
 async function openRishon(page) {
+  if (await page.getByRole('heading', { name: 'Parasha Practice tool', exact: true }).count()) return;
+  if (await page.getByRole('heading', { name: 'Choose an Aliyah', exact: true }).count()) {
+    await page.getByRole('button', { name: 'Back', exact: true }).click();
+  }
   await page.getByRole('button', { name: /Vayetzei/ }).click();
   await page.getByRole('button', { name: /Rishon/ }).click();
 }
@@ -51,8 +55,8 @@ try {
   await page.getByRole('heading', { name: 'Choose an Aliyah', exact: true }).waitFor();
   assert((await failed.cookies()).some(c => c.name === 'torah-practice-selection-v1' && decodeURIComponent(c.value).includes('ki-tetse')));
   await page.reload();
-  await page.getByRole('heading', { name: 'Choose a Parasha', exact: true }).waitFor();
-  await page.locator('.choice.remembered').filter({ hasText: 'Ki-Tetse' }).waitFor();
+  await page.getByRole('heading', { name: 'Choose an Aliyah', exact: true }).waitFor();
+  await page.getByText('Devarim · Ki-Tetse', { exact: true }).waitFor();
   await openRishon(page);
   await page.getByRole('alert').waitFor();
   assert.equal(catalogs, 1);
